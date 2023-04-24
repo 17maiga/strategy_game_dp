@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.github.spair:imgui-java-app:1.86.10")
 }
 
 application {
