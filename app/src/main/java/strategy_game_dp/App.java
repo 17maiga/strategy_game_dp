@@ -11,7 +11,8 @@ public class App extends Application {
     launch(new App());
   }
 
-  private final ImString myString = new ImString();
+  private static final int TABLEAU_LIGNES = 8;
+  private static final int TABLEAU_COLONNES = 8;
 
   @Override
   protected void initImGui(Configuration config) {
@@ -23,11 +24,29 @@ public class App extends Application {
   @Override
   public void process() {
     ImGui.dockSpaceOverViewport();
+    ImGui.begin("Tableau");
 
-    if (ImGui.begin("Hello, world!")) {
-      ImGui.inputText("My String", this.myString);
-      ImGui.text("Content of My Input: " + this.myString.get());
+    // Commencer le tableau
+    ImGui.beginTable("mon_tableau", TABLEAU_COLONNES);
+
+
+    // Remplir le tableau avec des cases
+    for (int i = 0; i < TABLEAU_LIGNES; i++) {
+      ImGui.tableNextRow();
+      for (int j = 0; j < TABLEAU_COLONNES; j++) {
+        ImGui.tableNextColumn();
+        ImGui.setNextItemWidth(50);
+        if (ImGui.button("Case " + i + " " + j)) {
+          System.out.println("Case " + i + " " + j);
+        }
+      }
     }
+
+    // Terminer le tableau
+    ImGui.endTable();
+
+    // Afficher la fenêtre ImGui
     ImGui.end();
+    ImGui.render();
   }
 }
