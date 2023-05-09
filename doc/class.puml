@@ -1,0 +1,63 @@
+@startuml
+class Game {
+  +World world
+  +Player player
+}
+
+class Player {
+  +int
+}
+
+class World {
+  +int width
+  +int height
+  +List<Cell> cells
+
+  +Cell getCell(int x, int y)
+}
+
+class Cell {
+  +int x
+  +int y
+  +int ressourceCount
+  +Ressource type
+}
+
+enum Ressource {
+
+}
+
+
+class Unit {
+  +int x
+  +int y
+  +int speed
+  +int hunger
+  +int xp
+
+  +void mine()
+  +boolean canMove(int x, int y)
+  +void move(int x, int y)
+}
+
+class Group extends Unit {
+  +List<Unit> units
+}
+
+class Woodworker extends Unit {}
+class Miner extends Unit {}
+class Farmer extends Unit {}
+
+class Expert extends Unit {
+  +Unit unit
+  +int returnTo
+
+  +void promote(Unit)
+  +Unit demote()
+}
+
+class Rider extends Unit {
+  +Unit unit
+}
+
+@enduml

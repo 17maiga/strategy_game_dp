@@ -4,7 +4,6 @@ import imgui.ImGui;
 import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.ImGuiConfigFlags;
-import imgui.type.ImString;
 
 public class App extends Application {
   public static void main(String[] args) {
