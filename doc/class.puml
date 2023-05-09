@@ -20,11 +20,14 @@ class Cell {
   +int x
   +int y
   +int ressourceCount
-  +Ressource type
+  +RessourceType type
 }
 
-enum Ressource {
-
+enum RessourceType {
+  Wood
+  Stone
+  Gold
+  Food
 }
 
 
