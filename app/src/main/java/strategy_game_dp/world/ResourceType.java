@@ -1,6 +1,6 @@
 package strategy_game_dp.world;
 
-public enum RessourceType {
+public enum ResourceType {
     Wood,
     Stone,
     Gold,

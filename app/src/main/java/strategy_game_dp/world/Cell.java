@@ -3,13 +3,13 @@ package strategy_game_dp.world;
 public class Cell {
     public int x;
     public int y;
-    public int ressourceCount;
-    public RessourceType type;
+    public int resourceCount;
+    public ResourceType type;
 
-    public Cell(int x, int y, int ressourceCount, RessourceType type) {
+    public Cell(int x, int y, int resourceCount, ResourceType type) {
         this.x = x;
         this.y = y;
-        this.ressourceCount = ressourceCount;
+        this.resourceCount = resourceCount;
         this.type = type;
     }
 }
