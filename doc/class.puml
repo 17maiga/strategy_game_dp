@@ -1,33 +1,77 @@
 @startuml
+skinparam groupInheritance 2
+skinparam backgroundColor #CCCCCC
+
 class Game {
-  +World world
-  +Player player
+  -WorldMap world
+  -Inventory inventory
+
+  +WorldMap getWorld()
+  +Inventory getInventory()
 }
 
-class Player {
-  +int
+class Inventory {
+  -Map<ResourceType, Integer> resources
+  {static} -Inventory instance
+
+  +void add(final ResourceType type, final int amount)
+  +void remove(final ResourceType type, final int amount)
+  +int get(final ResourceType type)
+  {static} +Inventory getInstance()
 }
 
-class World {
-  +int width
-  +int height
-  +List<Cell> cells
+class WorldMap {
+  -int width
+  -int height
+  -List<List<Cell>> cells
+  {static} -WorldMap instance
 
-  +Cell getCell(int x, int y)
+
+  +int getWidth()
+  +int getHeight()
+  +List<List<Cell>> getCells()
+
+  +Cell getCell(final int x, final int y)
+  +void insertUnits(List<Unit> units)
+
+  +WorldMap getInstance(int width, int height)
+  +WorldMap getInstance()
 }
 
 class Cell {
-  +int x
-  +int y
-  +int ressourceCount
-  +RessourceType type
+  -int x
+  -int y
+  -int ressourceAmount
+  -ResourceType type
+  -Unit unit
+
+  +int getX()
+  +int getY()
+  +int getResourceCount()
+  +void setResourceCount(final int count)
+  +ResourceType getResourceType()
+  +Unit getUnit()
+  +void setUnit(final Unit unit)
+
+  +void insertUnit(final Unit unit)
+  +int mine(final int amount)
+
+  +Cell findClosest(ResourceType resourceType)
 }
 
-enum RessourceType {
-  Wood
-  Stone
-  Gold
-  Food
+enum ResourceType {
+  {field} +WOOD (spawnChance=0.3, maxVeinSize=50)
+  {field} +STONE (spawnChance=0.3, maxVeinSize=50)
+  {field} +GOLD (spawnChance=0.3, maxVeinSize=50)
+  {field} +FOOD (spawnChance=0.3, maxVeinSize=50)
+
+  -float spawnChance
+  -int maxVeinSize
+
+  +float getSpawnChance()
+  +int getMaxVeinSize()
+
+  {static} +ResourceType getRandomType()
 }
 
 
