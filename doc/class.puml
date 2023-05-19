@@ -74,21 +74,45 @@ enum ResourceType {
   {static} +ResourceType getRandomType()
 }
 
+abstract class Producible {
+  {abstract} -Map<ResourceType, Integer> cost
 
-class Unit {
-  +int x
-  +int y
-  +int speed
-  +int hunger
-  +int xp
+  {abstract} +Map<ResourceType, Integer> getCost()
+}
 
+abstract class Unit extends Producible {
+  -int x
+  -int y
+  -int speed
+  -int hunger
+  -int xp
+  -boolean canMine
+  -Tool tool
+
+  +int getX()
+  +void setX(final int x)
+  +int getY()
+  +void setY(final int y)
+  +int getSpeed()
+  +int getHunger()
+  +Tool getTool()
+  +void setTool(final Tool tool)
+  +boolean canMine()
+  +void setCanMine(final boolean canMine)
   +void mine()
-  +boolean canMove(int x, int y)
-  +void move(int x, int y)
+  +void move(final int x, final int y)
+  +void eat()
 }
 
 class Group extends Unit {
-  +List<Unit> units
+  -List<Unit> units
+
+  +List<Unit> getUnits()
+
+  +void mine()
+  +boolean canMove(final int x, final int y)
+  +void move(final int x, final int y)
+  +boolean canEat(final Inventory inventory)
 }
 
 class Woodworker extends Unit {}
