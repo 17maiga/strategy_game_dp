@@ -115,20 +115,27 @@ class Group extends Unit {
   +boolean canEat(final Inventory inventory)
 }
 
-class Woodworker extends Unit {}
-class Miner extends Unit {}
-class Farmer extends Unit {}
+class UnitModifier {
+  #Unit unit
+  #boolean isActive
 
-class Expert extends Unit {
-  +Unit unit
-  +int returnTo
+  +boolean isEfficiencyMultiplier()
+  +int updateEfficiency(int efficiency)
 
-  +void promote(Unit)
-  +Unit demote()
+  +boolean isSpeedMultiplier()
+  +int updateSpeed(int speed)
+
+  +boolean isHungerMultiplier()
+  +int updateHunger(int hunger)
+
+  +void update()
 }
 
-class Rider extends Unit {
-  +Unit unit
+class ExpertModifier extends UnitModifier {
+  -int deactivateCountdown
+}
+
+class RiderModifier extends UnitModifier {
 }
 
 @enduml
