@@ -138,4 +138,21 @@ class ExpertModifier extends UnitModifier {
 class RiderModifier extends UnitModifier {
 }
 
+class Tool extends Producible {
+  -int efficiency
+  -ResourceType type
+
+  +int getEfficiency()
+  +ResourceType getResourceType()
+}
+
+abstract class Building<T extends Producible> {
+  {abstract} +T produce()
+}
+
+class BuildingFactory {
+  +Building<Unit> createUnitBuilding()
+  +Building<Tool> createToolBuilding(ResourceType type)
+}
+
 @enduml
