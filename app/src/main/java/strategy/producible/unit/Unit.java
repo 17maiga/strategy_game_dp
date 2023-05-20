@@ -80,7 +80,7 @@ public class Unit extends Producible {
   }
 
   public int getEfficiency() {
-    AtomicInteger efficiency = new AtomicInteger(1);
+    AtomicInteger efficiency = new AtomicInteger(tool.getEfficiency());
     getActiveModifiers().stream()
         .filter(UnitModifier::isEfficiencyMultiplier)
         .forEach(modifier -> efficiency.set(modifier.updateEfficiency(efficiency.get())));
@@ -122,7 +122,8 @@ public class Unit extends Producible {
     if (canMine()) {
       Cell cell = WorldMap.getInstance().getCell(getX(), getY());
       ResourceType resourceType = cell.getType();
-      Inventory.getInstance().add(resourceType, cell.mine(getEfficiency()));
+      if (tool.getTargets().contains(resourceType))
+        Inventory.getInstance().add(resourceType, cell.mine(getEfficiency()));
     }
   }
 

@@ -23,5 +23,5 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("strategy_game_dp.App")
+    mainClass.set("strategy.App")
 }
