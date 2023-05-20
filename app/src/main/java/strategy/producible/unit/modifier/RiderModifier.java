@@ -1,4 +1,4 @@
-package strategy_game_dp.producible.unit.modifier;
+package strategy.producible.unit.modifier;
 
 public class RiderModifier extends UnitModifier {
   @Override

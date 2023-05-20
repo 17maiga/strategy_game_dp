@@ -1,7 +1,7 @@
-package strategy_game_dp.producible.unit.modifier;
+package strategy.producible.unit.modifier;
 
 import org.jetbrains.annotations.Nullable;
-import strategy_game_dp.producible.unit.Unit;
+import strategy.producible.unit.Unit;
 
 /**
  * <b>Class for unit modifiers</b>

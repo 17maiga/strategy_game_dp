@@ -1,4 +1,4 @@
-package strategy_game_dp.producible.unit.modifier;
+package strategy.producible.unit.modifier;
 
 import org.jetbrains.annotations.Contract;
 

@@ -1,11 +1,11 @@
-package strategy_game_dp.world;
+package strategy.world;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import strategy_game_dp.producible.unit.Group;
-import strategy_game_dp.producible.unit.Unit;
+import strategy.producible.unit.Group;
+import strategy.producible.unit.Unit;
 
 public class Cell {
   private final int x;

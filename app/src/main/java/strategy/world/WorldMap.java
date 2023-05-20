@@ -1,10 +1,10 @@
-package strategy_game_dp.world;
+package strategy.world;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import strategy_game_dp.producible.unit.Unit;
+import strategy.producible.unit.Unit;
 
 public record WorldMap(int width, int height, List<List<Cell>> cells) {
   private static WorldMap instance = null;

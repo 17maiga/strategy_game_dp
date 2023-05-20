@@ -1,8 +1,8 @@
-package strategy_game_dp.producible;
+package strategy.producible;
 
 import java.util.List;
 import java.util.Map;
-import strategy_game_dp.world.ResourceType;
+import strategy.world.ResourceType;
 
 public class Tool extends Producible {
 

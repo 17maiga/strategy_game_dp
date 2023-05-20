@@ -1,8 +1,8 @@
-package strategy_game_dp.producible.unit;
+package strategy.producible.unit;
 
 import java.util.*;
-import strategy_game_dp.producible.Tool;
-import strategy_game_dp.world.WorldMap;
+import strategy.producible.Tool;
+import strategy.world.WorldMap;
 
 public class Group extends Unit {
 

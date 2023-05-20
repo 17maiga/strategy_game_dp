@@ -1,17 +1,17 @@
-package strategy_game_dp.producible.unit;
+package strategy.producible.unit;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import strategy_game_dp.producible.Producible;
-import strategy_game_dp.producible.Tool;
-import strategy_game_dp.producible.unit.modifier.UnitModifier;
-import strategy_game_dp.world.Cell;
-import strategy_game_dp.world.Inventory;
-import strategy_game_dp.world.ResourceType;
-import strategy_game_dp.world.WorldMap;
+import strategy.producible.Producible;
+import strategy.producible.Tool;
+import strategy.producible.unit.modifier.UnitModifier;
+import strategy.world.Cell;
+import strategy.world.Inventory;
+import strategy.world.ResourceType;
+import strategy.world.WorldMap;
 
 public class Unit extends Producible {
 

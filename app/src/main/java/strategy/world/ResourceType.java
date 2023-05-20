@@ -1,4 +1,4 @@
-package strategy_game_dp.world;
+package strategy.world;
 
 import org.jetbrains.annotations.Contract;
 
