@@ -10,11 +10,13 @@ public enum ResourceType {
 
   private final double spawnChance;
   private final int maxVeinSize;
+  private final char symbol;
 
   @Contract(pure = true)
   ResourceType(double spawnChance, int maxVeinSize) {
     this.spawnChance = spawnChance;
     this.maxVeinSize = maxVeinSize;
+    symbol = name().charAt(0);
   }
 
   @Contract(pure = true)
@@ -30,5 +32,10 @@ public enum ResourceType {
   @Contract(pure = true)
   public int getMaxVeinSize() {
     return maxVeinSize;
+  }
+
+  @Contract(pure = true)
+  public char getSymbol() {
+    return symbol;
   }
 }

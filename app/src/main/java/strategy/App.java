@@ -19,7 +19,9 @@ public class App extends Application {
   private static final int TABLEAU_COLONNES = 8;
 
   public static void main(String[] args) {
-    launch(new App());
+    Game game = new Game();
+    game.render();
+    // launch(new App());
   }
 
   @Override
