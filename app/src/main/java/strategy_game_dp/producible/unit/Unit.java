@@ -94,8 +94,8 @@ public class Unit extends Producible {
     return xp;
   }
 
-  public void setXp(final int xp) {
-    this.xp = xp;
+  public void addXp(final int xp) {
+    this.xp += xp;
   }
 
   public Tool getTool() {
