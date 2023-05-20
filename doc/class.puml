@@ -88,6 +88,7 @@ abstract class Unit extends Producible {
   -int xp
   -boolean canMine
   -Tool tool
+  -List<UnitModifier> modifiers
 
   +int getX()
   +void setX(final int x)
@@ -95,10 +96,15 @@ abstract class Unit extends Producible {
   +void setY(final int y)
   +int getSpeed()
   +int getHunger()
+  +int getEfficiency()
+  +int getXp()
+  +void addXp(final int xp)
   +Tool getTool()
   +void setTool(final Tool tool)
   +boolean canMine()
   +void setCanMine(final boolean canMine)
+  +List<UnitModifier> getModifiers()
+
   +void mine()
   +void move(final int x, final int y)
   +void eat()
@@ -108,11 +114,23 @@ class Group extends Unit {
   -List<Unit> units
 
   +List<Unit> getUnits()
+  +void setUnits(final List<Unit> units)
+  +void addUnit(final Unit unit)
+  +void removeUnit(final Unit unit)
 
+  +void setX(final int x)
+  +void setY(final int y)
+
+  +int getSpeed()
+  +int getHunger()
+  +int getEfficiency()
+  +int getXp()
+  +void addXp(final int xp)
+  +void setTool(final Tool tool)
+  +boolean canMine()
+  +void setCanMine(final boolean canMine)
   +void mine()
-  +boolean canMove(final int x, final int y)
-  +void move(final int x, final int y)
-  +boolean canEat(final Inventory inventory)
+  +boolean eat()
 }
 
 class UnitModifier {
