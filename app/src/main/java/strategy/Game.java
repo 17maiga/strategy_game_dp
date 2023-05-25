@@ -1,25 +1,47 @@
 package strategy;
 
 import java.util.*;
+
+import org.jetbrains.annotations.Contract;
+import strategy.producible.Tool;
 import strategy.producible.unit.Unit;
 import strategy.world.Inventory;
 import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
 public class Game {
+  private static Game instance;
   private final WorldMap worldMap;
   private final List<Unit> units;
   private final Inventory inventory;
 
-  public Game() {
-    worldMap = WorldMap.getInstance(8, 8);
+  public Game(int width, int height) {
+    worldMap = WorldMap.getInstance(width, height);
     units =
         List.of(
-            new Unit(new HashMap<>(), 0, 0, new ArrayList<>()),
-            new Unit(new HashMap<>(), 1, 1, new ArrayList<>()),
-            new Unit(new HashMap<>(), 2, 2, new ArrayList<>()));
+            new Unit(
+                (int) Math.floor(Math.random() * width),
+                (int) Math.floor(Math.random() * height),
+                new ArrayList<>()));
+    units.forEach(unit -> unit.setTool(new Tool(1, List.of(ResourceType.FOOD))));
     worldMap.insertUnits(units);
     inventory = Inventory.getInstance();
+    inventory.add(ResourceType.FOOD, 100);
+  }
+
+  @Contract(pure = true)
+  public static Game getInstance() {
+    if (instance == null) {
+      throw new UnsupportedOperationException();
+    }
+    return instance;
+  }
+
+  public static Game getInstance(int width, int height) {
+    if (instance == null) {
+      instance = new Game(width, height);
+    }
+    return instance;
   }
 
   public void render() {
@@ -41,20 +63,38 @@ public class Game {
           .get(lineCount)
           .forEach(
               cell -> {
-                char contents = ' ';
-                if (cell.getAmount() > 0) contents = cell.getType().getSymbol();
+                char resources = ' ';
+                String format = " %c ";
+                if (cell.getAmount() > 0) resources = cell.getType().getSymbol();
                 if (cell.getUnit() != null) {
                   units.add(cell.getUnit());
-                  contents = 'U';
+                  format = "[%c]";
                 }
-                System.out.printf(" %c ", contents);
+                System.out.printf(format, resources);
               });
       System.out.print(" | ");
       while (!units.isEmpty()) {
         Unit unit = units.poll();
-        System.out.printf(" (%d %d) ", unit.getX(), unit.getY());
+        System.out.printf(" [X:%d, Y:%d, T:%d] ", unit.getX(), unit.getY(), unit.getEfficiency());
       }
       System.out.print('\n');
     }
+  }
+
+  public List<Unit> getUnits() {
+    return units;
+  }
+
+  public WorldMap getWorldMap() {
+    return worldMap;
+  }
+
+  public Inventory getInventory() {
+    return inventory;
+  }
+
+  public boolean turn() {
+    units.forEach(Unit::turn);
+    return worldMap.isWin();
   }
 }

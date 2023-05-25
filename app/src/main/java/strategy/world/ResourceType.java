@@ -2,6 +2,12 @@ package strategy.world;
 
 import org.jetbrains.annotations.Contract;
 
+/**
+ * Enum representing the different types of resources in the game.
+ *
+ * <p>Each resource has a spawn chance, a maximum vein size, and a symbol used to represent it on
+ * the map.
+ */
 public enum ResourceType {
   WOOD(0.3, 50),
   STONE(0.3, 50),

@@ -2,10 +2,17 @@ package strategy.world;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import strategy.producible.unit.Unit;
 
+/**
+ * Singleton class that represents the world map.
+ *
+ * <p>The world map is a 2D grid of {@link Cell}s.
+ */
 public record WorldMap(int width, int height, List<List<Cell>> cells) {
   private static WorldMap instance = null;
 
@@ -27,9 +34,7 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
 
   @Contract(pure = true)
   public static WorldMap getInstance() {
-    if (instance == null) {
-      throw new UnsupportedOperationException();
-    }
+    if (instance == null) throw new UnsupportedOperationException();
     return instance;
   }
 
@@ -37,9 +42,25 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
     return cells.get(y).get(x);
   }
 
+  /**
+   * Inserts units into the world map.
+   *
+   * @param units the units to insert
+   */
   public void insertUnits(@NotNull List<Unit> units) {
-    for (Unit unit : units) {
-      cells.get(unit.getY()).get(unit.getX()).insertUnit(unit);
-    }
+    for (Unit unit : units) cells.get(unit.getY()).get(unit.getX()).insertUnit(unit);
+  }
+
+  @Contract(pure = true)
+  public List<Unit> getUnits() {
+    return cells.stream()
+        .flatMap(List::stream)
+        .map(Cell::getUnit)
+        .filter(Objects::nonNull)
+        .toList();
+  }
+
+  public boolean isWin() {
+    return cells.stream().allMatch(row -> row.stream().allMatch(cell -> cell.getAmount() == 0));
   }
 }

@@ -9,15 +9,12 @@ public class Group extends Unit {
   private List<Unit> units;
 
   public Group(int x, int y) {
-    super(new HashMap<>(), x, y, new ArrayList<>());
+    super(x, y, new ArrayList<>());
   }
 
   public void addUnit(Unit unit) {
-    if (unit instanceof Group) {
-      units.addAll(((Group) unit).getUnits());
-    } else {
-      units.add(unit);
-    }
+    if (unit instanceof Group) units.addAll(((Group) unit).getUnits());
+    else units.add(unit);
   }
 
   public void removeUnit(Unit unit) {
@@ -103,8 +100,8 @@ public class Group extends Unit {
   }
 
   @Override
-  public void mine() {
-    units.forEach(Unit::mine);
+  public boolean mine() {
+    return units.stream().allMatch(Unit::mine);
   }
 
   @Override

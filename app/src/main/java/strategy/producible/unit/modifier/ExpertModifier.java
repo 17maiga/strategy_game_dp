@@ -2,8 +2,14 @@ package strategy.producible.unit.modifier;
 
 import org.jetbrains.annotations.Contract;
 
+/**
+ * Expert modifier for units.
+ *
+ * <p>Increases efficiency, speed, and hunger.
+ */
 public class ExpertModifier extends UnitModifier {
 
+  /** Countdown to deactivate. */
   private int deactivateCountdown;
 
   @Contract(pure = true)
@@ -44,6 +50,12 @@ public class ExpertModifier extends UnitModifier {
     return 2 * hunger;
   }
 
+  /**
+   * <b>Toggles the modifier's active state if necessary.</b>
+   *
+   * <p>Activates if the unit has more than 100 XP and can mine. Deactivates if the unit has not
+   * been able to mine for {@link #deactivateCountdown} turns.
+   */
   @Override
   public void update() {
     if (unit == null) {
@@ -51,17 +63,14 @@ public class ExpertModifier extends UnitModifier {
       return;
     }
     if (active) {
-      if (unit.canMine()) {
-        deactivateCountdown = 5;
-      } else {
+      if (unit.canMine()) deactivateCountdown = 5;
+      else {
         deactivateCountdown--;
         if (deactivateCountdown == 0) {
           active = false;
           deactivateCountdown = 5;
         }
       }
-    } else if (unit.getXp() > 100 && unit.canMine()) {
-      active = true;
-    }
+    } else if (unit.getXp() > 100 && unit.canMine()) active = true;
   }
 }

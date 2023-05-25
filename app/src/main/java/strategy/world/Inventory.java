@@ -1,36 +1,62 @@
 package strategy.world;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Singleton class that represents the inventory of the player.
+ *
+ * <p>The inventory is a map of {@link ResourceType}s to the amount of that resource the player has.
+ */
 public class Inventory {
-  private final Map<ResourceType, Integer> resources;
-
   private static Inventory instance;
+  private final Map<ResourceType, Integer> resources;
 
   @Contract(pure = true)
   public Inventory() {
     this.resources = new HashMap<>();
   }
 
+  public static Inventory getInstance() {
+    if (instance == null) instance = new Inventory();
+    return instance;
+  }
+
   public void add(final ResourceType type, final int amount) {
     resources.put(type, resources.getOrDefault(type, 0) + amount);
   }
 
+  public void add(final @NotNull Map<ResourceType, Integer> cost) {
+    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+      add(entry.getKey(), entry.getValue());
+    }
+  }
+
   public void remove(final ResourceType type, final int amount) {
-    resources.put(type, resources.getOrDefault(type, 0) - amount);
+    resources.put(type, Math.max(resources.getOrDefault(type, 0) - amount, 0));
+  }
+
+  public void remove(final @NotNull Map<ResourceType, Integer> cost) {
+    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+      remove(entry.getKey(), entry.getValue());
+    }
   }
 
   public int get(final ResourceType type) {
     return resources.getOrDefault(type, 0);
   }
 
-  public static Inventory getInstance() {
-    if (instance == null) {
-      instance = new Inventory();
+  public boolean contains(final ResourceType type, final int amount) {
+    return resources.getOrDefault(type, 0) >= amount;
+  }
+
+  public boolean contains(final @NotNull Map<ResourceType, Integer> cost) {
+    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
+      if (!contains(entry.getKey(), entry.getValue())) return false;
     }
-    return instance;
+    return true;
   }
 }
