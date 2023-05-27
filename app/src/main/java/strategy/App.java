@@ -13,20 +13,20 @@ public class App extends Application {
   private static final int TABLEAU_COLONNES = 8;
 
   public static void main(String[] args) {
-    Game game = Game.getInstance(TABLEAU_LIGNES, TABLEAU_COLONNES);
+    Game.getInstance(TABLEAU_LIGNES, TABLEAU_COLONNES);
     Scanner scanner = new Scanner(System.in);
     String input = "";
     System.out.println("Use 'help' to get help");
     boolean shouldQuit = false;
     while (!shouldQuit) {
-      game.render();
+      Game.getInstance().render();
       boolean shouldTurn = false;
       while (!shouldTurn) {
         input = scanner.nextLine();
         switch (input) {
           case "h", "help" -> System.out.println("Enter 'turn' to finish turn, 'quit' to quit");
           case "t", "turn", "" -> {
-            if (game.turn()) {
+            if (Game.getInstance().turn()) {
               System.out.println("You won!");
               shouldQuit = true;
             }

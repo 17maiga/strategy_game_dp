@@ -28,7 +28,7 @@ public class Tool extends Producible {
   @Contract(" -> new")
   @Override
   public @NotNull @Unmodifiable Map<ResourceType, Integer> getCost() {
-    return Map.of(ResourceType.WOOD, 1, ResourceType.STONE, 1);
+    return Map.of(ResourceType.WOOD, 1, ResourceType.ROCK, 1);
   }
 
   public int getEfficiency() {

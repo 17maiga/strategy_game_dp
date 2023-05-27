@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ToolBuilding implements IBuilding<Tool> {
   @Override
   public Tool produce() {
-    if (Inventory.getInstance().contains(Map.of(ResourceType.WOOD, 10, ResourceType.STONE, 10))) {
-      Inventory.getInstance().remove(Map.of(ResourceType.WOOD, 10, ResourceType.STONE, 10));
+    if (Inventory.getInstance().contains(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10))) {
+      Inventory.getInstance().remove(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10));
       AtomicInteger efficiency = new AtomicInteger();
       AtomicReference<List<ResourceType>> targets = new AtomicReference<>();
       WorldMap.getInstance().getUnits().stream()

@@ -10,11 +10,15 @@ public class Group extends Unit {
 
   public Group(int x, int y) {
     super(x, y, new ArrayList<>());
+    units = new ArrayList<>();
   }
 
   public void addUnit(Unit unit) {
-    if (unit instanceof Group) units.addAll(((Group) unit).getUnits());
-    else units.add(unit);
+    if (unit instanceof Group) {
+      units.addAll(((Group) unit).getUnits());
+    } else {
+      units.add(unit);
+    }
   }
 
   public void removeUnit(Unit unit) {
@@ -107,5 +111,15 @@ public class Group extends Unit {
   @Override
   public void eat() {
     units.forEach(Unit::eat);
+  }
+
+  @Override
+  public void turn() {
+    units.forEach(Unit::turn);
+    units.forEach(unit -> {
+      if (unit.getX() != getX() || unit.getY() != getY()) {
+        removeUnit(unit);
+      }
+    });
   }
 }

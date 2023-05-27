@@ -21,7 +21,9 @@ public class Inventory {
   }
 
   public static Inventory getInstance() {
-    if (instance == null) instance = new Inventory();
+    if (instance == null) {
+      instance = new Inventory();
+    }
     return instance;
   }
 
@@ -30,9 +32,7 @@ public class Inventory {
   }
 
   public void add(final @NotNull Map<ResourceType, Integer> cost) {
-    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
-      add(entry.getKey(), entry.getValue());
-    }
+    cost.entrySet().forEach(entry -> add(entry.getKey(), entry.getValue()));
   }
 
   public void remove(final ResourceType type, final int amount) {
@@ -40,9 +40,7 @@ public class Inventory {
   }
 
   public void remove(final @NotNull Map<ResourceType, Integer> cost) {
-    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
-      remove(entry.getKey(), entry.getValue());
-    }
+    cost.entrySet().forEach(entry -> remove(entry.getKey(), entry.getValue()));
   }
 
   public int get(final ResourceType type) {
@@ -54,9 +52,6 @@ public class Inventory {
   }
 
   public boolean contains(final @NotNull Map<ResourceType, Integer> cost) {
-    for (Map.Entry<ResourceType, Integer> entry : cost.entrySet()) {
-      if (!contains(entry.getKey(), entry.getValue())) return false;
-    }
-    return true;
+    return cost.entrySet().stream().allMatch(entry -> contains(entry.getKey(), entry.getValue()));
   }
 }

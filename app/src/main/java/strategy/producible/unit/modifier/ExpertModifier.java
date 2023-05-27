@@ -71,6 +71,8 @@ public class ExpertModifier extends UnitModifier {
           deactivateCountdown = 5;
         }
       }
-    } else if (unit.getXp() > 100 && unit.canMine()) active = true;
+    } else if (unit.getXp() > 100 && unit.canMine()) {
+      active = true;
+    }
   }
 }

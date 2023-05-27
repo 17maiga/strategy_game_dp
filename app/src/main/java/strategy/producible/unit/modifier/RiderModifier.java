@@ -22,7 +22,10 @@ public class RiderModifier extends UnitModifier {
       active = false;
       return;
     }
-    if (active && !unit.canMine()) active = false;
-    else if (unit.canMine()) active = true;
+    if (active && !unit.canMine()) {
+      active = false;
+    } else if (unit.canMine()) {
+      active = true;
+    }
   }
 }

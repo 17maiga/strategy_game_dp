@@ -9,25 +9,27 @@ import org.jetbrains.annotations.Contract;
  * the map.
  */
 public enum ResourceType {
-  WOOD(0.3, 50),
-  STONE(0.3, 50),
-  GOLD(0.3, 50),
-  FOOD(0.3, 50);
+  WOOD(0.3, 3, "Woodcutter"),
+  ROCK(0.3, 3, "Miner"),
+  GOLD(0.3, 3, "Miner"),
+  FOOD(0.3, 3, "Farmer");
 
   private final double spawnChance;
   private final int maxVeinSize;
   private final char symbol;
+  private final String job;
 
   @Contract(pure = true)
-  ResourceType(double spawnChance, int maxVeinSize) {
+  ResourceType(double spawnChance, int maxVeinSize, String job) {
     this.spawnChance = spawnChance;
     this.maxVeinSize = maxVeinSize;
     symbol = name().charAt(0);
+    this.job = job;
   }
 
   @Contract(pure = true)
   public static ResourceType getRandomType() {
-    return WOOD;
+    return values()[(int) (Math.random() * values().length)];
   }
 
   @Contract(pure = true)
@@ -43,5 +45,10 @@ public enum ResourceType {
   @Contract(pure = true)
   public char getSymbol() {
     return symbol;
+  }
+
+  @Contract(pure = true)
+  public String getJob() {
+    return job;
   }
 }

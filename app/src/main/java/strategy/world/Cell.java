@@ -86,10 +86,12 @@ public class Cell {
    * @param unit the unit to insert
    */
   public void insertUnit(final Unit unit) {
-    if (this.unit == null) this.unit = unit;
-    else {
-      if (this.unit instanceof Group) ((Group) this.unit).addUnit(unit);
-      else {
+    if (this.unit == null) {
+      this.unit = unit;
+    } else {
+      if (this.unit instanceof Group) {
+        ((Group) this.unit).addUnit(unit);
+      } else {
         final Group group = new Group(x, y);
         group.addUnit(this.unit);
         group.addUnit(unit);
@@ -128,7 +130,9 @@ public class Cell {
     visited.add(this);
     while (!queue.isEmpty()) {
       Cell cell = queue.poll();
-      if (cell.getType() == type && cell.getAmount() > 0) return cell;
+      if (cell.getType() == type && cell.getAmount() > 0) {
+        return cell;
+      }
       if (cell.getX() > 0) {
         Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
         if (!visited.contains(left)) {

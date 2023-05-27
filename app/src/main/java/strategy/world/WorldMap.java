@@ -34,7 +34,9 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
 
   @Contract(pure = true)
   public static WorldMap getInstance() {
-    if (instance == null) throw new UnsupportedOperationException();
+    if (instance == null) {
+      throw new UnsupportedOperationException();
+    }
     return instance;
   }
 
@@ -48,7 +50,7 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
    * @param units the units to insert
    */
   public void insertUnits(@NotNull List<Unit> units) {
-    for (Unit unit : units) cells.get(unit.getY()).get(unit.getX()).insertUnit(unit);
+    units.forEach(unit -> cells.get(unit.getY()).get(unit.getX()).insertUnit(unit));
   }
 
   @Contract(pure = true)

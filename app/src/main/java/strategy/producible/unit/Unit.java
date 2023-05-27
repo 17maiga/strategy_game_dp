@@ -28,23 +28,18 @@ import strategy.world.WorldMap;
  * resources together more efficiently.
  */
 public class Unit extends Producible {
-
   /** How many tiles the unit can move each turn. */
   private final int speed;
-
   /** How much the unit needs to eat each turn. */
   private final int hunger;
-
   /** The modifiers that can affect this unit. */
   private final List<UnitModifier> modifiers;
 
   private int x;
   private int y;
   private int xp = 0;
-
   /** Whether the unit can mine resources. */
   private boolean canMine;
-
   /** The tool the unit is equipped with. */
   private Tool tool;
 
@@ -55,7 +50,7 @@ public class Unit extends Producible {
     this.hunger = 1;
     this.canMine = true;
     this.modifiers = modifiers;
-    for (final UnitModifier modifier : this.modifiers) modifier.setUnit(this);
+    this.modifiers.forEach(modifier -> modifier.setUnit(this));
   }
 
   @Override
@@ -200,11 +195,17 @@ public class Unit extends Producible {
     } else {
       while (speed > 0) {
         if (Math.abs(x - getX()) > Math.abs(y - getY())) {
-          if (x > getX()) setX(getX() + 1);
-          else setX(getX() - 1);
+          if (x > getX()) {
+            setX(getX() + 1);
+          } else {
+            setX(getX() - 1);
+          }
         } else {
-          if (y > getY()) setY(getY() + 1);
-          else setY(getY() - 1);
+          if (y > getY()) {
+            setY(getY() + 1);
+          } else {
+            setY(getY() - 1);
+          }
         }
         speed--;
       }
@@ -220,29 +221,21 @@ public class Unit extends Producible {
    */
   public void eat() {
     setCanMine(Inventory.getInstance().get(ResourceType.FOOD) > getHunger());
-    if (canMine()) Inventory.getInstance().remove(ResourceType.FOOD, getHunger());
+    if (canMine()) {
+      Inventory.getInstance().remove(ResourceType.FOOD, getHunger());
+    }
   }
 
   public void turn() {
     eat();
     boolean hasMined = mine();
     if (!hasMined) {
-      System.out.printf("Unit at %d, %d could not mine!%n", getX(), getY());
       Cell closest =
           WorldMap.getInstance().getCell(getX(), getY()).findClosest(getTool().getTargets().get(0));
       if (closest != null) {
-        System.out.printf(
-            "Closest %s is at %d, %d%n",
-            getTool().getTargets().get(0), closest.getX(), closest.getY());
-        System.out.printf(
-            "Unit at %d, %d moving to %d, %d%n", getX(), getY(), closest.getX(), closest.getY());
         move(closest.getX(), closest.getY());
-        System.out.printf(
-            "Unit at %d, %d moved to %d, %d%n", getX(), getY(), closest.getX(), closest.getY());
       }
-    } else {
-      System.out.printf("Unit at %d, %d mined!%n", getX(), getY());
     }
-    for (final UnitModifier modifier : modifiers) modifier.update();
+    this.modifiers.forEach(UnitModifier::update);
   }
 }

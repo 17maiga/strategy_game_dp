@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.jetbrains.annotations.Contract;
 import strategy.producible.Tool;
+import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
 import strategy.world.Inventory;
 import strategy.world.ResourceType;
@@ -17,13 +18,16 @@ public class Game {
 
   public Game(int width, int height) {
     worldMap = WorldMap.getInstance(width, height);
-    units =
-        List.of(
-            new Unit(
-                (int) Math.floor(Math.random() * width),
-                (int) Math.floor(Math.random() * height),
-                new ArrayList<>()));
-    units.forEach(unit -> unit.setTool(new Tool(1, List.of(ResourceType.FOOD))));
+    units = new ArrayList<>();
+    for (ResourceType type : ResourceType.values()) {
+      Unit unit =
+          new Unit(
+              (int) Math.floor(Math.random() * width),
+              (int) Math.floor(Math.random() * height),
+              new ArrayList<>());
+      units.add(unit);
+      unit.setTool(new Tool(1, List.of(type)));
+    }
     worldMap.insertUnits(units);
     inventory = Inventory.getInstance();
     inventory.add(ResourceType.FOOD, 100);
@@ -45,37 +49,72 @@ public class Game {
   }
 
   public void render() {
-    for (int i = 0; i < 120; i++) System.out.print('-');
+    for (int i = 0; i < 120; i++) {
+      System.out.print('-');
+    }
     System.out.print('\n');
-    System.out.printf(
-        "Inventory | FOOD: %d, GOLD: %d, STONE: %d, WOOD: %d\n",
-        inventory.get(ResourceType.FOOD),
-        inventory.get(ResourceType.GOLD),
-        inventory.get(ResourceType.STONE),
-        inventory.get(ResourceType.WOOD));
-    for (int i = 0; i < 120; i++) System.out.print('-');
+    System.out.print("Inventory: ");
+    System.out.println(
+        Arrays.stream(ResourceType.values())
+            .map(type -> type + ": " + inventory.get(type))
+            .reduce((a, b) -> a + ", " + b)
+            .orElse(""));
+    for (int i = 0; i < 120; i++) {
+      System.out.print('-');
+    }
     System.out.print('\n');
 
     Queue<Unit> units = new ArrayDeque<>();
+    int cellWidth =
+        String.valueOf(
+                    Arrays.stream(ResourceType.values())
+                        .mapToInt(ResourceType::getMaxVeinSize)
+                        .max()
+                        .orElse(0))
+                .length()
+            + 2;
+
     for (int lineCount = 0; lineCount < worldMap.height(); lineCount++) {
       worldMap
           .cells()
           .get(lineCount)
           .forEach(
               cell -> {
-                char resources = ' ';
-                String format = " %c ";
-                if (cell.getAmount() > 0) resources = cell.getType().getSymbol();
+                StringBuilder displayBuilder = new StringBuilder();
                 if (cell.getUnit() != null) {
                   units.add(cell.getUnit());
-                  format = "[%c]";
+                  displayBuilder.append('[');
+                } else {
+                  displayBuilder.append(' ');
                 }
-                System.out.printf(format, resources);
+                if (cell.getAmount() > 0) {
+                  displayBuilder.append(cell.getType().getSymbol());
+                  displayBuilder.append(cell.getAmount());
+                }
+                while (displayBuilder.length() < cellWidth) {
+                  displayBuilder.append(' ');
+                }
+                if (cell.getUnit() != null) {
+                  displayBuilder.append(']');
+                } else {
+                  displayBuilder.append(' ');
+                }
+                System.out.print(displayBuilder.toString());
               });
       System.out.print(" | ");
       while (!units.isEmpty()) {
         Unit unit = units.poll();
-        System.out.printf(" [X:%d, Y:%d, T:%d] ", unit.getX(), unit.getY(), unit.getEfficiency());
+        String jobs = "Unemployed";
+        if (unit instanceof Group) {
+          jobs = "Group";
+        } else if (unit.getTool() != null) {
+          jobs =
+              unit.getTool().getTargets().stream()
+                  .map(ResourceType::getJob)
+                  .reduce((a, b) -> a + " - " + b)
+                  .orElse("");
+        }
+        System.out.printf(" [%s | %d:%d] ", jobs, unit.getX(), unit.getY());
       }
       System.out.print('\n');
     }
