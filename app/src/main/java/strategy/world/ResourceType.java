@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Contract;
  */
 public enum ResourceType {
   WOOD(0.3, 3, "Woodcutter"),
-  ROCK(0.3, 3, "Miner"),
-  GOLD(0.3, 3, "Miner"),
+  ROCK(0.3, 3, "Rock Miner"),
+  GOLD(0.3, 3, "Gold Miner"),
   FOOD(0.3, 3, "Farmer");
 
   private final double spawnChance;

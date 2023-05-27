@@ -31,16 +31,12 @@ public class Inventory {
     resources.put(type, resources.getOrDefault(type, 0) + amount);
   }
 
-  public void add(final @NotNull Map<ResourceType, Integer> cost) {
-    cost.entrySet().forEach(entry -> add(entry.getKey(), entry.getValue()));
-  }
-
   public void remove(final ResourceType type, final int amount) {
     resources.put(type, Math.max(resources.getOrDefault(type, 0) - amount, 0));
   }
 
   public void remove(final @NotNull Map<ResourceType, Integer> cost) {
-    cost.entrySet().forEach(entry -> remove(entry.getKey(), entry.getValue()));
+    cost.forEach(this::remove);
   }
 
   public int get(final ResourceType type) {

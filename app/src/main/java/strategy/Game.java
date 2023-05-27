@@ -12,25 +12,14 @@ import strategy.world.WorldMap;
 
 public class Game {
   private static Game instance;
-  private final WorldMap worldMap;
-  private final List<Unit> units;
-  private final Inventory inventory;
 
   public Game(int width, int height) {
-    worldMap = WorldMap.getInstance(width, height);
-    units = new ArrayList<>();
-    for (ResourceType type : ResourceType.values()) {
-      Unit unit =
-          new Unit(
-              (int) Math.floor(Math.random() * width),
-              (int) Math.floor(Math.random() * height),
-              new ArrayList<>());
-      units.add(unit);
-      unit.setTool(new Tool(1, List.of(type)));
-    }
-    worldMap.insertUnits(units);
-    inventory = Inventory.getInstance();
-    inventory.add(ResourceType.FOOD, 100);
+    Unit u1 = new Unit(0, 0, new ArrayList<>());
+    u1.setTool(new Tool(2, List.of(ResourceType.WOOD, ResourceType.ROCK)));
+    Unit u2 = new Unit(0, 0, new ArrayList<>());
+    u2.setTool(new Tool(2, List.of(ResourceType.WOOD, ResourceType.FOOD)));
+    WorldMap.getInstance(width, height).insertUnits(List.of(u2, u1));
+    Inventory.getInstance().add(ResourceType.FOOD, 100);
   }
 
   @Contract(pure = true)
@@ -41,11 +30,10 @@ public class Game {
     return instance;
   }
 
-  public static Game getInstance(int width, int height) {
+  public static void createInstance(int width, int height) {
     if (instance == null) {
       instance = new Game(width, height);
     }
-    return instance;
   }
 
   public void render() {
@@ -56,7 +44,7 @@ public class Game {
     System.out.print("Inventory: ");
     System.out.println(
         Arrays.stream(ResourceType.values())
-            .map(type -> type + ": " + inventory.get(type))
+            .map(type -> type + ": " + Inventory.getInstance().get(type))
             .reduce((a, b) -> a + ", " + b)
             .orElse(""));
     for (int i = 0; i < 120; i++) {
@@ -72,10 +60,10 @@ public class Game {
                         .max()
                         .orElse(0))
                 .length()
-            + 2;
+            + 3;
 
-    for (int lineCount = 0; lineCount < worldMap.height(); lineCount++) {
-      worldMap
+    for (int lineCount = 0; lineCount < WorldMap.getInstance().height(); lineCount++) {
+      WorldMap.getInstance()
           .cells()
           .get(lineCount)
           .forEach(
@@ -83,7 +71,11 @@ public class Game {
                 StringBuilder displayBuilder = new StringBuilder();
                 if (cell.getUnit() != null) {
                   units.add(cell.getUnit());
-                  displayBuilder.append('[');
+                  if (cell.getUnit().canMine()) {
+                    displayBuilder.append('[');
+                  } else {
+                    displayBuilder.append('(');
+                  }
                 } else {
                   displayBuilder.append(' ');
                 }
@@ -95,11 +87,15 @@ public class Game {
                   displayBuilder.append(' ');
                 }
                 if (cell.getUnit() != null) {
-                  displayBuilder.append(']');
+                  if (cell.getUnit().canMine()) {
+                    displayBuilder.append(']');
+                  } else {
+                    displayBuilder.append(')');
+                  }
                 } else {
                   displayBuilder.append(' ');
                 }
-                System.out.print(displayBuilder.toString());
+                System.out.print(displayBuilder);
               });
       System.out.print(" | ");
       while (!units.isEmpty()) {
@@ -114,26 +110,24 @@ public class Game {
                   .reduce((a, b) -> a + " - " + b)
                   .orElse("");
         }
-        System.out.printf(" [%s | %d:%d] ", jobs, unit.getX(), unit.getY());
+        String format = unit.canMine() ? " [%s | %d:%d] " : " (%s | %d:%d) ";
+        System.out.printf(format, jobs, unit.getX(), unit.getY());
       }
       System.out.print('\n');
     }
+    WorldMap.getInstance()
+        .getUnits()
+        .forEach(
+            unit -> System.out.println(unit.getX() + " " + unit.getY() + " " + unit.getTargets()));
   }
 
-  public List<Unit> getUnits() {
-    return units;
+  public Status turn() {
+    return WorldMap.getInstance().turn();
   }
 
-  public WorldMap getWorldMap() {
-    return worldMap;
-  }
-
-  public Inventory getInventory() {
-    return inventory;
-  }
-
-  public boolean turn() {
-    units.forEach(Unit::turn);
-    return worldMap.isWin();
+  public enum Status {
+    RUNNING,
+    WON,
+    LOST
   }
 }

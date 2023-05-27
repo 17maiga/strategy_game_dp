@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import strategy.Game;
 import strategy.producible.unit.Unit;
 
 /**
@@ -53,16 +54,22 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
     units.forEach(unit -> cells.get(unit.getY()).get(unit.getX()).insertUnit(unit));
   }
 
-  @Contract(pure = true)
-  public List<Unit> getUnits() {
+  public Game.Status turn() {
+    getUnits().forEach(Unit::turn);
+    if (cells.stream().allMatch(row -> row.stream().allMatch(cell -> cell.getAmount() == 0))) {
+      return Game.Status.WON;
+    }
+    if (getUnits().stream().noneMatch(Unit::canMine)) {
+      return Game.Status.LOST;
+    }
+    return Game.Status.RUNNING;
+  }
+
+  public @NotNull List<Unit> getUnits() {
     return cells.stream()
         .flatMap(List::stream)
         .map(Cell::getUnit)
         .filter(Objects::nonNull)
         .toList();
-  }
-
-  public boolean isWin() {
-    return cells.stream().allMatch(row -> row.stream().allMatch(cell -> cell.getAmount() == 0));
   }
 }

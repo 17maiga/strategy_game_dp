@@ -13,21 +13,24 @@ public class App extends Application {
   private static final int TABLEAU_COLONNES = 8;
 
   public static void main(String[] args) {
-    Game.getInstance(TABLEAU_LIGNES, TABLEAU_COLONNES);
+    Game.createInstance(TABLEAU_LIGNES, TABLEAU_COLONNES);
     Scanner scanner = new Scanner(System.in);
-    String input = "";
     System.out.println("Use 'help' to get help");
     boolean shouldQuit = false;
     while (!shouldQuit) {
       Game.getInstance().render();
       boolean shouldTurn = false;
       while (!shouldTurn) {
-        input = scanner.nextLine();
+        String input = scanner.nextLine();
         switch (input) {
           case "h", "help" -> System.out.println("Enter 'turn' to finish turn, 'quit' to quit");
           case "t", "turn", "" -> {
-            if (Game.getInstance().turn()) {
+            Game.Status status = Game.getInstance().turn();
+            if (status == Game.Status.WON) {
               System.out.println("You won!");
+              shouldQuit = true;
+            } else if (status == Game.Status.LOST) {
+              System.out.println("You lost!");
               shouldQuit = true;
             }
             shouldTurn = true;

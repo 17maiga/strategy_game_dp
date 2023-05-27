@@ -4,8 +4,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
 
@@ -21,24 +21,6 @@ public class Cell {
   private final ResourceType type;
   private int amount;
   private Unit unit;
-
-  @Contract(pure = true)
-  public Cell(final int x, final int y, final ResourceType type, final int amount) {
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    this.amount = amount;
-  }
-
-  public Cell(final int x, final int y, final @NotNull ResourceType type) {
-    this.x = x;
-    this.y = y;
-    this.type = type;
-    amount =
-        Math.random() < type.getSpawnChance()
-            ? (int) Math.floor(Math.random() * type.getMaxVeinSize())
-            : 0;
-  }
 
   public Cell(final int x, final int y) {
     this.x = x;
@@ -66,11 +48,7 @@ public class Cell {
     return amount;
   }
 
-  public void setAmount(final int amount) {
-    this.amount = amount;
-  }
-
-  public Unit getUnit() {
+  public @Nullable Unit getUnit() {
     return unit;
   }
 
@@ -118,50 +96,61 @@ public class Cell {
   }
 
   /**
-   * Finds the closest cell of the given type in the world map.
+   * Finds the closest cell of one of the given types in the world map.
    *
-   * @param type the type to find
-   * @return the closest cell of the given type
+   * @param types the types to find
+   * @return the closest cell of one of the given types
    */
-  public Cell findClosest(ResourceType type) {
+  public Cell findClosest(List<ResourceType> types) {
     Queue<Cell> queue = new ArrayDeque<>();
     List<Cell> visited = new ArrayList<>();
     queue.add(this);
     visited.add(this);
     while (!queue.isEmpty()) {
       Cell cell = queue.poll();
-      if (cell.getType() == type && cell.getAmount() > 0) {
+      if (types.contains(cell.getType()) && cell.getAmount() > 0) {
         return cell;
       }
-      if (cell.getX() > 0) {
-        Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
-        if (!visited.contains(left)) {
-          queue.add(left);
-          visited.add(left);
-        }
-      }
-      if (cell.getX() < WorldMap.getInstance().width() - 1) {
-        Cell right = WorldMap.getInstance().getCell(cell.getX() + 1, cell.getY());
-        if (!visited.contains(right)) {
-          queue.add(right);
-          visited.add(right);
-        }
-      }
-      if (cell.getY() > 0) {
-        Cell top = WorldMap.getInstance().getCell(cell.getX(), cell.getY() - 1);
-        if (!visited.contains(top)) {
-          queue.add(top);
-          visited.add(top);
-        }
-      }
-      if (cell.getY() < WorldMap.getInstance().height() - 1) {
-        Cell bottom = WorldMap.getInstance().getCell(cell.getX(), cell.getY() + 1);
-        if (!visited.contains(bottom)) {
-          queue.add(bottom);
-          visited.add(bottom);
-        }
-      }
+      checkNeighbours(queue, visited, cell);
     }
     return null;
+  }
+
+  /**
+   * Checks the neighbours of the given cell and adds them to the queue if they haven't been visited
+   *
+   * @param queue the queue to add the neighbours to
+   * @param visited the list of visited cells
+   * @param cell the cell to check the neighbours of
+   */
+  private void checkNeighbours(Queue<Cell> queue, List<Cell> visited, @NotNull Cell cell) {
+    if (cell.getX() > 0) {
+      Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
+      if (!visited.contains(left)) {
+        queue.add(left);
+        visited.add(left);
+      }
+    }
+    if (cell.getX() < WorldMap.getInstance().width() - 1) {
+      Cell right = WorldMap.getInstance().getCell(cell.getX() + 1, cell.getY());
+      if (!visited.contains(right)) {
+        queue.add(right);
+        visited.add(right);
+      }
+    }
+    if (cell.getY() > 0) {
+      Cell top = WorldMap.getInstance().getCell(cell.getX(), cell.getY() - 1);
+      if (!visited.contains(top)) {
+        queue.add(top);
+        visited.add(top);
+      }
+    }
+    if (cell.getY() < WorldMap.getInstance().height() - 1) {
+      Cell bottom = WorldMap.getInstance().getCell(cell.getX(), cell.getY() + 1);
+      if (!visited.contains(bottom)) {
+        queue.add(bottom);
+        visited.add(bottom);
+      }
+    }
   }
 }

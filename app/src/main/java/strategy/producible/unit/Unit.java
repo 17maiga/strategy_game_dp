@@ -123,6 +123,11 @@ public class Unit extends Producible {
     return efficiency.get();
   }
 
+  public List<ResourceType> getTargets() {
+    if (tool == null) return List.of();
+    return tool.getTargets();
+  }
+
   public int getXp() {
     return xp;
   }
@@ -220,7 +225,7 @@ public class Unit extends Producible {
    * Inventory}. If not, the unit will not be able to mine resources.
    */
   public void eat() {
-    setCanMine(Inventory.getInstance().get(ResourceType.FOOD) > getHunger());
+    setCanMine(Inventory.getInstance().get(ResourceType.FOOD) >= getHunger());
     if (canMine()) {
       Inventory.getInstance().remove(ResourceType.FOOD, getHunger());
     }
@@ -231,7 +236,7 @@ public class Unit extends Producible {
     boolean hasMined = mine();
     if (!hasMined) {
       Cell closest =
-          WorldMap.getInstance().getCell(getX(), getY()).findClosest(getTool().getTargets().get(0));
+          WorldMap.getInstance().getCell(getX(), getY()).findClosest(getTool().getTargets());
       if (closest != null) {
         move(closest.getX(), closest.getY());
       }

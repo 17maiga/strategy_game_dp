@@ -2,11 +2,12 @@ package strategy.producible.unit;
 
 import java.util.*;
 import strategy.producible.Tool;
+import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
 public class Group extends Unit {
 
-  private List<Unit> units;
+  private final List<Unit> units;
 
   public Group(int x, int y) {
     super(x, y, new ArrayList<>());
@@ -27,10 +28,6 @@ public class Group extends Unit {
 
   public List<Unit> getUnits() {
     return units;
-  }
-
-  public void setUnits(List<Unit> units) {
-    this.units = units;
   }
 
   @Override
@@ -65,6 +62,12 @@ public class Group extends Unit {
         .mapToInt(unit -> unit.getTool().getEfficiency())
         .max()
         .orElse(0);
+  }
+
+  public List<ResourceType> getTargets() {
+    Set<ResourceType> targets = new HashSet<>();
+    units.forEach(unit -> targets.addAll(unit.getTool().getTargets()));
+    return new ArrayList<>(targets);
   }
 
   @Override
@@ -116,10 +119,15 @@ public class Group extends Unit {
   @Override
   public void turn() {
     units.forEach(Unit::turn);
-    units.forEach(unit -> {
-      if (unit.getX() != getX() || unit.getY() != getY()) {
-        removeUnit(unit);
-      }
-    });
+    units.stream()
+        .filter(unit -> unit.getX() != getX() || unit.getY() != getY())
+        .toList()
+        .forEach(this::removeUnit);
+    if (units.size() == 1) {
+      Unit unit = units.remove(0);
+      WorldMap.getInstance().getCell(getX(), getY()).setUnit(unit);
+    } else if (units.isEmpty()) {
+      WorldMap.getInstance().getCell(getX(), getY()).setUnit(null);
+    }
   }
 }
