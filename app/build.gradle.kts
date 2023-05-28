@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.spair:imgui-java-app:1.86.10")
     implementation("org.jetbrains:annotations:24.0.1")
 }
 

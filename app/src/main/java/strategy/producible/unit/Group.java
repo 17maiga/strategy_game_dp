@@ -2,7 +2,6 @@ package strategy.producible.unit;
 
 import java.util.*;
 import strategy.producible.Tool;
-import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
 public class Group extends Unit {
@@ -64,10 +63,8 @@ public class Group extends Unit {
         .orElse(0);
   }
 
-  public List<ResourceType> getTargets() {
-    Set<ResourceType> targets = new HashSet<>();
-    units.forEach(unit -> targets.addAll(unit.getTool().getTargets()));
-    return new ArrayList<>(targets);
+  public String getJob() {
+    return "Group";
   }
 
   @Override

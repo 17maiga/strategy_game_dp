@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import strategy.Utils;
 import strategy.producible.Producible;
 import strategy.producible.Tool;
 import strategy.producible.unit.modifier.UnitModifier;
@@ -40,6 +41,8 @@ public class Unit extends Producible {
   private int xp = 0;
   /** Whether the unit can mine resources. */
   private boolean canMine;
+  /** Whether the unit has played this turn. Used when playing interactively. */
+  private boolean hasPlayed = false;
   /** The tool the unit is equipped with. */
   private Tool tool;
 
@@ -123,9 +126,12 @@ public class Unit extends Producible {
     return efficiency.get();
   }
 
-  public List<ResourceType> getTargets() {
-    if (tool == null) return List.of();
-    return tool.getTargets();
+  public String getJob() {
+    if (tool == null) return "Unemployed";
+    return tool.getTargets().stream()
+        .map(ResourceType::getJob)
+        .reduce((a, b) -> a + ", " + b)
+        .orElse("Unemployed");
   }
 
   public int getXp() {
@@ -152,6 +158,14 @@ public class Unit extends Producible {
     this.canMine = canMine;
   }
 
+  public boolean hasPlayed() {
+    return hasPlayed;
+  }
+
+  public void setHasPlayed(final boolean hasPlayed) {
+    this.hasPlayed = hasPlayed;
+  }
+
   /**
    * <b>Get the unit's currently active modifiers.</b>
    *
@@ -175,7 +189,9 @@ public class Unit extends Producible {
       Cell cell = WorldMap.getInstance().getCell(getX(), getY());
       ResourceType resourceType = cell.getType();
       if (tool.getTargets().contains(resourceType) && cell.getAmount() > 0) {
-        Inventory.getInstance().add(resourceType, cell.mine(getEfficiency()));
+        int amount = cell.mine(getEfficiency());
+        Inventory.getInstance().add(resourceType, amount);
+        addXp(amount);
         return true;
       }
     }
@@ -192,7 +208,9 @@ public class Unit extends Producible {
    */
   public void move(final int x, final int y) {
     WorldMap.getInstance().getCell(getX(), getY()).setUnit(null);
-    int distance = Math.abs(x - getX()) + Math.abs(y - getY());
+    int distance =
+        Math.abs(Utils.clamp(x, 0, WorldMap.getInstance().width()) - getX())
+            + Math.abs(Utils.clamp(y, 0, WorldMap.getInstance().height()) - getY());
     int speed = getSpeed();
     if (distance <= speed) {
       setX(x);
@@ -233,8 +251,7 @@ public class Unit extends Producible {
 
   public void turn() {
     eat();
-    boolean hasMined = mine();
-    if (!hasMined) {
+    if (!mine()) {
       Cell closest =
           WorldMap.getInstance().getCell(getX(), getY()).findClosest(getTool().getTargets());
       if (closest != null) {

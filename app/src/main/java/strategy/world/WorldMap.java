@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import strategy.Game;
+import strategy.Utils;
 import strategy.producible.unit.Unit;
 
 /**
@@ -42,8 +43,8 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
   }
 
   public Cell getCell(final int x, final int y) {
-    int newX = Math.min(Math.max(0, x), cells.get(0).size() - 1);
-    int newY = Math.min(Math.max(0, y), cells.size() - 1);
+    int newX = Utils.clamp(x, 0, cells.get(0).size() - 1);
+    int newY = Utils.clamp(y, 0, cells.size() - 1);
     return cells.get(newY).get(newX);
   }
 
@@ -57,7 +58,8 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
   }
 
   public Game.Status turn() {
-    getUnits().forEach(Unit::turn);
+    getUnits().stream().filter(u -> !u.hasPlayed()).forEach(Unit::turn);
+    getUnits().forEach(u -> u.setHasPlayed(false));
     if (cells.stream().allMatch(row -> row.stream().allMatch(cell -> cell.getAmount() == 0))) {
       return Game.Status.WON;
     }
