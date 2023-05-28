@@ -7,12 +7,12 @@ public class RiderModifier extends UnitModifier {
   }
 
   @Override
-  public int updateSpeed(int speed) {
+  public int updateSpeed(final int speed) {
     return 2 * speed;
   }
 
   @Override
-  public int updateHunger(int hunger) {
+  public int updateHunger(final int hunger) {
     return hunger + 3;
   }
 

@@ -24,7 +24,7 @@ public class ExpertModifier extends UnitModifier {
 
   @Override
   @Contract(pure = true)
-  public int updateEfficiency(int efficiency) {
+  public int updateEfficiency(final int efficiency) {
     return efficiency * 2;
   }
 
@@ -35,7 +35,7 @@ public class ExpertModifier extends UnitModifier {
 
   @Override
   @Contract(pure = true)
-  public int updateSpeed(int speed) {
+  public int updateSpeed(final int speed) {
     return (int) Math.floor(speed * 1.5);
   }
 
@@ -46,7 +46,7 @@ public class ExpertModifier extends UnitModifier {
 
   @Override
   @Contract(pure = true)
-  public int updateHunger(int hunger) {
+  public int updateHunger(final int hunger) {
     return 2 * hunger;
   }
 

@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
@@ -101,7 +100,7 @@ public class Cell {
    * @param types the types to find
    * @return the closest cell of one of the given types
    */
-  public Cell findClosest(List<ResourceType> types) {
+  public Cell findClosest(final List<ResourceType> types) {
     Queue<Cell> queue = new ArrayDeque<>();
     List<Cell> visited = new ArrayList<>();
     queue.add(this);
@@ -111,46 +110,35 @@ public class Cell {
       if (types.contains(cell.getType()) && cell.getAmount() > 0) {
         return cell;
       }
-      checkNeighbours(queue, visited, cell);
+      if (cell.getX() > 0) {
+        Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
+        if (!visited.contains(left)) {
+          queue.add(left);
+          visited.add(left);
+        }
+      }
+      if (cell.getX() < WorldMap.getInstance().width() - 1) {
+        Cell right = WorldMap.getInstance().getCell(cell.getX() + 1, cell.getY());
+        if (!visited.contains(right)) {
+          queue.add(right);
+          visited.add(right);
+        }
+      }
+      if (cell.getY() > 0) {
+        Cell top = WorldMap.getInstance().getCell(cell.getX(), cell.getY() - 1);
+        if (!visited.contains(top)) {
+          queue.add(top);
+          visited.add(top);
+        }
+      }
+      if (cell.getY() < WorldMap.getInstance().height() - 1) {
+        Cell bottom = WorldMap.getInstance().getCell(cell.getX(), cell.getY() + 1);
+        if (!visited.contains(bottom)) {
+          queue.add(bottom);
+          visited.add(bottom);
+        }
+      }
     }
     return null;
-  }
-
-  /**
-   * Checks the neighbours of the given cell and adds them to the queue if they haven't been visited
-   *
-   * @param queue the queue to add the neighbours to
-   * @param visited the list of visited cells
-   * @param cell the cell to check the neighbours of
-   */
-  private void checkNeighbours(Queue<Cell> queue, List<Cell> visited, @NotNull Cell cell) {
-    if (cell.getX() > 0) {
-      Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
-      if (!visited.contains(left)) {
-        queue.add(left);
-        visited.add(left);
-      }
-    }
-    if (cell.getX() < WorldMap.getInstance().width() - 1) {
-      Cell right = WorldMap.getInstance().getCell(cell.getX() + 1, cell.getY());
-      if (!visited.contains(right)) {
-        queue.add(right);
-        visited.add(right);
-      }
-    }
-    if (cell.getY() > 0) {
-      Cell top = WorldMap.getInstance().getCell(cell.getX(), cell.getY() - 1);
-      if (!visited.contains(top)) {
-        queue.add(top);
-        visited.add(top);
-      }
-    }
-    if (cell.getY() < WorldMap.getInstance().height() - 1) {
-      Cell bottom = WorldMap.getInstance().getCell(cell.getX(), cell.getY() + 1);
-      if (!visited.contains(bottom)) {
-        queue.add(bottom);
-        visited.add(bottom);
-      }
-    }
   }
 }

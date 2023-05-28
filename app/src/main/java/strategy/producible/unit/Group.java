@@ -9,12 +9,12 @@ public class Group extends Unit {
 
   private final List<Unit> units;
 
-  public Group(int x, int y) {
+  public Group(final int x, final int y) {
     super(x, y, new ArrayList<>());
     units = new ArrayList<>();
   }
 
-  public void addUnit(Unit unit) {
+  public void addUnit(final Unit unit) {
     if (unit instanceof Group) {
       units.addAll(((Group) unit).getUnits());
     } else {
@@ -22,7 +22,7 @@ public class Group extends Unit {
     }
   }
 
-  public void removeUnit(Unit unit) {
+  public void removeUnit(final Unit unit) {
     units.remove(unit);
   }
 

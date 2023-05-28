@@ -23,7 +23,7 @@ public class UnitModifier {
     return unit;
   }
 
-  public void setUnit(@Nullable Unit unit) {
+  public void setUnit(@Nullable final Unit unit) {
     this.unit = unit;
   }
 
@@ -51,7 +51,7 @@ public class UnitModifier {
    * @param efficiency The efficiency stat to modify.
    * @return The modified efficiency stat.
    */
-  public int updateEfficiency(int efficiency) {
+  public int updateEfficiency(final int efficiency) {
     return efficiency;
   }
 
@@ -69,7 +69,7 @@ public class UnitModifier {
    * @param speed The speed stat to modify.
    * @return The modified speed stat.
    */
-  public int updateSpeed(int speed) {
+  public int updateSpeed(final int speed) {
     return speed;
   }
 
@@ -87,7 +87,7 @@ public class UnitModifier {
    * @param hunger The hunger stat to modify.
    * @return The modified hunger stat.
    */
-  public int updateHunger(int hunger) {
+  public int updateHunger(final int hunger) {
     return hunger;
   }
 

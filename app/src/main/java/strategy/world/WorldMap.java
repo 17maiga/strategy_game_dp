@@ -17,7 +17,7 @@ import strategy.producible.unit.Unit;
 public record WorldMap(int width, int height, List<List<Cell>> cells) {
   private static WorldMap instance = null;
 
-  public static WorldMap getInstance(int width, int height) {
+  public static WorldMap getInstance(final int width, final int height) {
     if (instance == null) {
       List<List<Cell>> cells = new ArrayList<>();
       for (int i = 0; i < height; i++) {
@@ -52,7 +52,7 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
    *
    * @param units the units to insert
    */
-  public void insertUnits(@NotNull List<Unit> units) {
+  public void insertUnits(final @NotNull List<Unit> units) {
     units.forEach(unit -> cells.get(unit.getY()).get(unit.getX()).insertUnit(unit));
   }
 

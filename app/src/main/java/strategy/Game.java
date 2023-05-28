@@ -13,7 +13,7 @@ import strategy.world.WorldMap;
 public class Game {
   private static Game instance;
 
-  public Game(int width, int height) {
+  public Game(final int width, final int height) {
     Unit u1 = new Unit(0, 0, new ArrayList<>());
     u1.setTool(new Tool(2, List.of(ResourceType.WOOD, ResourceType.ROCK)));
     Unit u2 = new Unit(0, 0, new ArrayList<>());
@@ -30,7 +30,7 @@ public class Game {
     return instance;
   }
 
-  public static void createInstance(int width, int height) {
+  public static void createInstance(final int width, final int height) {
     if (instance == null) {
       instance = new Game(width, height);
     }

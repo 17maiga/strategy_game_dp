@@ -1,95 +1,129 @@
 @startuml
-skinparam groupInheritance 2
 skinparam backgroundColor #CCCCCC
+skinparam linetype ortho
 
-class Game {
-  -WorldMap world
-  -Inventory inventory
+class App {
+  {static} -final int HEIGHT
+  {static} -final int WIDTH
 
-  +WorldMap getWorld()
-  +Inventory getInventory()
+  {static} +void main(String[] args)
+  #void initImGui(Configuration config)
+  +void process()
 }
 
-class Inventory {
-  -Map<ResourceType, Integer> resources
-  {static} -Inventory instance
+class Game {
+  {static} -Game instance
+  +enum Status {RUNNING, WON, LOST}
 
-  +void add(final ResourceType type, final int amount)
-  +void remove(final ResourceType type, final int amount)
-  +int get(final ResourceType type)
-  {static} +Inventory getInstance()
+  +Game(final int width, final int height)
+  {static} +Game getInstance()
+  {static} +void createInstance(final int width, final int height)
+  +void render()
+  +Status turn()
 }
 
 class WorldMap {
-  -int width
-  -int height
-  -List<List<Cell>> cells
+  -final int width
+  -final int height
+  -final List<List<Cell>> cells
   {static} -WorldMap instance
 
-
-  +int getWidth()
-  +int getHeight()
-  +List<List<Cell>> getCells()
-
+  +WorldMap(final int width, final int height, final List<List<Cell>> cells)
+  +int width()
+  +int height()
+  +List<List<Cell>> cells()
+  {static} +WorldMap getInstance(final int width, final int height)
+  {static} +WorldMap getInstance()
   +Cell getCell(final int x, final int y)
-  +void insertUnits(List<Unit> units)
-
-  +WorldMap getInstance(int width, int height)
-  +WorldMap getInstance()
+  +void insertUnits(final List<Unit> units)
+  +Game.Status turn()
+  +List<Unit> getUnits()
 }
-
-class Cell {
-  -int x
-  -int y
-  -int ressourceAmount
-  -ResourceType type
-  -Unit unit
-
-  +int getX()
-  +int getY()
-  +int getResourceCount()
-  +void setResourceCount(final int count)
-  +ResourceType getResourceType()
-  +Unit getUnit()
-  +void setUnit(final Unit unit)
-
-  +void insertUnit(final Unit unit)
-  +int mine(final int amount)
-
-  +Cell findClosest(ResourceType resourceType)
-}
+WorldMap o-- Cell
 
 enum ResourceType {
-  {field} +WOOD (spawnChance=0.3, maxVeinSize=50)
-  {field} +STONE (spawnChance=0.3, maxVeinSize=50)
-  {field} +GOLD (spawnChance=0.3, maxVeinSize=50)
-  {field} +FOOD (spawnChance=0.3, maxVeinSize=50)
+  {field} +WOOD (spawnChance=0.3, maxVeinSize=50, job="Woodcutter")
+  {field} +ROCK (spawnChance=0.3, maxVeinSize=50, job="Rock Miner")
+  {field} +GOLD (spawnChance=0.3, maxVeinSize=50, job="Gold Miner")
+  {field} +FOOD (spawnChance=0.3, maxVeinSize=50, job="Farmer")
+  -final double spawnChance
+  -final int maxVeinSize
+  -final char symbol
+  -final String job
 
-  -float spawnChance
-  -int maxVeinSize
-
-  +float getSpawnChance()
-  +int getMaxVeinSize()
-
+  +ResourceType(final double spawnChance, final int maxVeinSize, final String job)
   {static} +ResourceType getRandomType()
+  +double getSpawnChance()
+  +int getMaxVeinSize()
+  +char getSymbol()
+  +String getJob()
 }
+
+class Inventory {
+  {static} -Inventory instance
+  -final Map<ResourceType, Integer> resources
+
+  +Inventory()
+  {static} +Inventory getInstance()
+  +void add(final ResourceType type, final int amount)
+  +void remove(final ResourceType type, final int amount)
+  +void remove(final Map<ResourceType, Integer> resources)
+  +int get(final ResourceType type)
+  +boolean contains(final ResourceType type, final int amount)
+  +boolean contains(final Map<ResourceType, Integer> resources)
+}
+Inventory o-- ResourceType
+
+class Cell {
+  -final int x;
+  -final int y;
+  -final ResourceType type;
+  -int amount;
+  -Unit unit;
+
+  +Cell(final int x, final int y)
+  +int getX()
+  +int getY()
+  +ResourceType getType()
+  +int getAmount()
+  +Unit getUnit()
+  +void setUnit(final Unit unit)
+  +void insertUnit(final Unit unit)
+  +int mine(final int amount)
+  +Cell findClosest(final List<ResourceType> types)
+}
+Cell o-- Unit
+Cell o-- ResourceType
 
 abstract class Producible {
-  {abstract} -Map<ResourceType, Integer> cost
-
   {abstract} +Map<ResourceType, Integer> getCost()
 }
+Producible o-- ResourceType
 
-abstract class Unit extends Producible {
+class Tool extends Producible {
+  -final int efficiency
+  -final List<ResourceType> targets
+
+  +Tool(final int efficiency, final List<ResourceType> targets)
+  +Map<ResourceType, Integer> getCost()
+  +int getEfficiency()
+  +List<ResourceType> getTargets()
+  +boolean canMine(final ResourceType type)
+}
+Tool o-- ResourceType
+
+class Unit extends Producible {
+  -final int speed
+  -final int hunger
+  -final List<UnitModifier> modifiers
   -int x
   -int y
-  -int speed
-  -int hunger
   -int xp
   -boolean canMine
   -Tool tool
-  -List<UnitModifier> modifiers
 
+  +Unit(final int x, final int y, final List<UnitModifier> modifiers)
+  +Map<ResourceType, Integer> getCost()
   +int getX()
   +void setX(final int x)
   +int getY()
@@ -97,80 +131,94 @@ abstract class Unit extends Producible {
   +int getSpeed()
   +int getHunger()
   +int getEfficiency()
+  +List<ResourceType> getTargets()
   +int getXp()
   +void addXp(final int xp)
   +Tool getTool()
   +void setTool(final Tool tool)
   +boolean canMine()
   +void setCanMine(final boolean canMine)
-  +List<UnitModifier> getModifiers()
-
-  +void mine()
+  +List<UnitModifiers> getActiveModifiers()
+  +boolean mine()
   +void move(final int x, final int y)
   +void eat()
+  +void turn()
 }
+Unit o-- UnitModifier
+Unit o-- Tool
 
 class Group extends Unit {
-  -List<Unit> units
+  -final List<Unit> units
 
-  +List<Unit> getUnits()
-  +void setUnits(final List<Unit> units)
+  +Group(final int x, final int y)
   +void addUnit(final Unit unit)
   +void removeUnit(final Unit unit)
-
+  +List<Unit> getUnits()
   +void setX(final int x)
   +void setY(final int y)
-
   +int getSpeed()
   +int getHunger()
   +int getEfficiency()
+  +List<ResourceType> getTargets()
   +int getXp()
   +void addXp(final int xp)
+  +Tool getTool()
   +void setTool(final Tool tool)
   +boolean canMine()
   +void setCanMine(final boolean canMine)
-  +void mine()
-  +boolean eat()
+  +boolean mine()
+  +void eat()
+  +void turn()
 }
+Group o-- Unit
 
 class UnitModifier {
   #Unit unit
-  #boolean isActive
+  #boolean active
 
+  +Unit getUnit()
+  +void setUnit(final Unit unit)
+  +boolean isActive()
   +boolean isEfficiencyMultiplier()
-  +int updateEfficiency(int efficiency)
-
+  +int updateEfficiency(final int efficiency)
   +boolean isSpeedMultiplier()
-  +int updateSpeed(int speed)
-
+  +int updateSpeed(final int speed)
   +boolean isHungerMultiplier()
-  +int updateHunger(int hunger)
-
+  +int updateHunger(final int hunger)
   +void update()
 }
+UnitModifier o-- Unit
 
 class ExpertModifier extends UnitModifier {
   -int deactivateCountdown
+
+  +ExpertModifier()
+  +boolean isEfficiencyMultiplier()
+  +int updateEfficiency(final int efficiency)
+  +boolean isSpeedMultiplier()
+  +int updateSpeed(final int speed)
+  +boolean isHungerMultiplier()
+  +int updateHunger(final int hunger)
+  +void update()
 }
 
 class RiderModifier extends UnitModifier {
+  +boolean isSpeedMultiplier()
+  +int updateSpeed(final int speed)
+  +int updateHunger(final int hunger)
+  +void update()
 }
 
-class Tool extends Producible {
-  -int efficiency
-  -ResourceType type
-
-  +int getEfficiency()
-  +ResourceType getResourceType()
+interface IBuilding<T> {
+  +T produce()
 }
 
-abstract class Building<T extends Producible> {
-  {abstract} +T produce()
+class UnitBuilding implements IBuilding {
+  +Unit produce()
 }
 
-class BuildingFactory {
-  +Building<Unit> createUnitBuilding()
-  +Building<Tool> createToolBuilding(ResourceType type)
+class ToolBuilding implements IBuilding {
+  +Tool produce()
 }
 
 @enduml

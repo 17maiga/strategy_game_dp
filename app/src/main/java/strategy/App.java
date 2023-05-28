@@ -15,11 +15,11 @@ import strategy.world.WorldMap;
 import java.util.Scanner;
 
 public class App extends Application {
-  private static final int TABLEAU_LIGNES = 8;
-  private static final int TABLEAU_COLONNES = 8;
+  private static final int HEIGHT = 8;
+  private static final int WIDTH = 8;
 
   public static void main(String[] args) {
-    Game.createInstance(TABLEAU_LIGNES, TABLEAU_COLONNES);
+    Game.createInstance(WIDTH, HEIGHT);
     Scanner scanner = new Scanner(System.in);
     System.out.println("Use 'help' to get help");
     boolean shouldQuit = false;
@@ -118,12 +118,12 @@ public class App extends Application {
     ImGui.begin("Tableau");
 
     // Commencer le tableau
-    ImGui.beginTable("mon_tableau", TABLEAU_COLONNES);
+    ImGui.beginTable("mon_tableau", WIDTH);
 
     // Remplir le tableau avec des cases carrées de 50px x 50px
-    for (int i = 0; i < TABLEAU_LIGNES; i++) {
+    for (int i = 0; i < HEIGHT; i++) {
       ImGui.tableNextRow();
-      for (int j = 0; j < TABLEAU_COLONNES; j++) {
+      for (int j = 0; j < WIDTH; j++) {
         ImGui.tableNextColumn();
         // Set a height for each row
         // mettre en blanc

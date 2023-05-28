@@ -1,10 +1,9 @@
 package strategy.world;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Singleton class that represents the inventory of the player.
@@ -35,8 +34,8 @@ public class Inventory {
     resources.put(type, Math.max(resources.getOrDefault(type, 0) - amount, 0));
   }
 
-  public void remove(final @NotNull Map<ResourceType, Integer> cost) {
-    cost.forEach(this::remove);
+  public void remove(final @NotNull Map<ResourceType, Integer> resources) {
+    resources.forEach(this::remove);
   }
 
   public int get(final ResourceType type) {
@@ -47,7 +46,7 @@ public class Inventory {
     return resources.getOrDefault(type, 0) >= amount;
   }
 
-  public boolean contains(final @NotNull Map<ResourceType, Integer> cost) {
-    return cost.entrySet().stream().allMatch(entry -> contains(entry.getKey(), entry.getValue()));
+  public boolean contains(final @NotNull Map<ResourceType, Integer> resources) {
+    return resources.entrySet().stream().allMatch(entry -> contains(entry.getKey(), entry.getValue()));
   }
 }

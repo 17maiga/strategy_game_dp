@@ -20,7 +20,7 @@ public enum ResourceType {
   private final String job;
 
   @Contract(pure = true)
-  ResourceType(double spawnChance, int maxVeinSize, String job) {
+  ResourceType(final double spawnChance, final int maxVeinSize, final String job) {
     this.spawnChance = spawnChance;
     this.maxVeinSize = maxVeinSize;
     symbol = name().charAt(0);
