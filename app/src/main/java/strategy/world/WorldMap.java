@@ -42,7 +42,9 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
   }
 
   public Cell getCell(final int x, final int y) {
-    return cells.get(y).get(x);
+    int newX = Math.min(Math.max(0, x), cells.get(0).size() - 1);
+    int newY = Math.min(Math.max(0, y), cells.size() - 1);
+    return cells.get(newY).get(newX);
   }
 
   /**

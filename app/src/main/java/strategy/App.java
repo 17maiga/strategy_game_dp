@@ -6,6 +6,12 @@ import imgui.app.Configuration;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiStyleVar;
+import strategy.producible.unit.Group;
+import strategy.producible.unit.Unit;
+import strategy.world.Cell;
+import strategy.world.ResourceType;
+import strategy.world.WorldMap;
+
 import java.util.Scanner;
 
 public class App extends Application {
@@ -21,9 +27,18 @@ public class App extends Application {
       Game.getInstance().render();
       boolean shouldTurn = false;
       while (!shouldTurn) {
+        System.out.print("> ");
         String input = scanner.nextLine();
         switch (input) {
-          case "h", "help" -> System.out.println("Enter 'turn' to finish turn, 'quit' to quit");
+          case "h", "help" -> System.out.print(
+              """
+              List of commands:
+              h, help         Show this help menu
+              t, turn         Play the next turn
+              i, inspect      Inspect the contents of a specific tile
+              m, map          Render the game map again
+              q, quit         Quit the game
+              """);
           case "t", "turn", "" -> {
             Game.Status status = Game.getInstance().turn();
             if (status == Game.Status.WON) {
@@ -35,6 +50,50 @@ public class App extends Application {
             }
             shouldTurn = true;
           }
+          case "i", "inspect" -> {
+            System.out.print(
+                "Enter the coordinates of the cell you wish to inspect (x and y separated by a space): ");
+            String[] coordinates = scanner.nextLine().split(" ");
+            if (coordinates.length != 2) {
+              System.out.println("Invalid coordinates");
+              break;
+            }
+            try {
+              int x = Integer.parseInt(coordinates[0]);
+              int y = Integer.parseInt(coordinates[1]);
+              Cell cell = WorldMap.getInstance().getCell(x, y);
+              System.out.println("Cell at (" + cell.getX() + ", " + cell.getY() + "):");
+              System.out.println(
+                  "  Resources: "
+                      + (cell.getAmount() > 0 ? cell.getAmount() + " " + cell.getType() : "None"));
+              Unit unit = cell.getUnit();
+              if (unit != null) {
+                if (unit instanceof Group) {
+                  System.out.println("  Unit: Group");
+                  ((Group) unit)
+                      .getUnits()
+                      .forEach(
+                          u ->
+                              System.out.println(
+                                  "    - "
+                                      + u.getTargets().stream()
+                                          .map(ResourceType::getJob)
+                                          .reduce((a, b) -> a + ", " + b)
+                                          .orElse("Unemployed")));
+                } else {
+                  System.out.println(
+                      "  Unit: "
+                          + unit.getTargets().stream()
+                              .map(ResourceType::getJob)
+                              .reduce((a, b) -> a + ", " + b)
+                              .orElse("Unemployed"));
+                }
+              }
+            } catch (NumberFormatException e) {
+              System.out.println("Invalid coordinates");
+            }
+          }
+          case "m", "map" -> Game.getInstance().render();
           case "q", "quit" -> {
             shouldQuit = true;
             shouldTurn = true;
