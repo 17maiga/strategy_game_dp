@@ -1,6 +1,7 @@
 package strategy.producible.unit;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jetbrains.annotations.NotNull;
 import strategy.producible.Tool;
@@ -57,12 +58,15 @@ public class Group extends Unit {
 
   @Override
   public int getEfficiency(final ResourceType type) {
-    return units.stream()
-        .filter(Unit::canMine)
-        .filter(unit -> unit.getTool().canMine(type))
-        .mapToInt(unit -> unit.getTool().efficiency())
-        .max()
-        .orElse(0);
+    List<Unit> units =
+        this.units.stream()
+            .filter(Unit::canMine)
+            .filter(unit -> unit.getTool().canMine(type))
+            .toList();
+    AtomicReference<Float> base =
+        new AtomicReference<>((float) units.stream().mapToInt(u -> u.getEfficiency(type)).sum());
+    units.forEach(u -> base.updateAndGet(v -> (float) (v * 1.1)));
+    return (int) Math.floor(base.get());
   }
 
   public String getJob() {
