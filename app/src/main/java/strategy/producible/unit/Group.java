@@ -60,7 +60,7 @@ public class Group extends Unit {
     return units.stream()
         .filter(Unit::canMine)
         .filter(unit -> unit.getTool().canMine(type))
-        .mapToInt(unit -> unit.getTool().getEfficiency())
+        .mapToInt(unit -> unit.getTool().efficiency())
         .max()
         .orElse(0);
   }
@@ -89,9 +89,9 @@ public class Group extends Unit {
     units.stream()
         .filter(
             u ->
-                u.getTool().getTargets().size() == tool.getTargets().size()
-                    && new HashSet<>(u.getTool().getTargets()).containsAll(tool.getTargets()))
-        .min(Comparator.comparingInt(u -> u.getTool().getEfficiency()))
+                u.getTool().targets().size() == tool.targets().size()
+                    && new HashSet<>(u.getTool().targets()).containsAll(tool.targets()))
+        .min(Comparator.comparingInt(u -> u.getTool().efficiency()))
         .ifPresent(u -> u.setTool(tool));
   }
 

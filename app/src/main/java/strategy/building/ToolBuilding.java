@@ -8,26 +8,24 @@ import strategy.world.Inventory;
 import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 public class ToolBuilding implements IBuilding {
 
   private final List<ResourceType> targets;
+  private BuildingStatus buildingStatus;
   private int productionTime;
 
   @Contract(pure = true)
   public ToolBuilding(List<ResourceType> targets) {
     this.targets = targets;
     this.productionTime = 2;
+    buildingStatus = BuildingStatus.IN_PROGRESS;
   }
 
   @Override
   public void produce(final WorldMap worldMap, final @NotNull Inventory inventory) {
     if (productionTime > 0) {
       productionTime--;
+      buildingStatus = BuildingStatus.IN_PROGRESS;
       return;
     }
     productionTime = 2;
@@ -46,22 +44,24 @@ public class ToolBuilding implements IBuilding {
                 + efficiency
                 + ".");
         inventory.removeResources(cost);
+        buildingStatus = BuildingStatus.PRODUCED;
         return;
       }
       unit =
           worldMap.getUnits().stream()
               .filter(
                   u ->
-                      u.getTool().getTargets().size() == targets.size()
-                          && new HashSet<>(u.getTool().getTargets()).containsAll(targets))
-              .min(Comparator.comparingInt(u -> u.getTool().getEfficiency()))
+                      u.getTool().targets().size() == targets.size()
+                          && new HashSet<>(u.getTool().targets()).containsAll(targets))
+              .min(Comparator.comparingInt(u -> u.getTool().efficiency()))
               .orElse(null);
       if (unit != null) {
-        efficiency = unit.getTool().getEfficiency() + 1;
+        efficiency = unit.getTool().efficiency() + 1;
         unit.setTool(new Tool(efficiency, targets));
         System.out.println(
             "Tool factory for " + targets + " upgraded a unit to " + efficiency + ".");
         inventory.removeResources(cost);
+        buildingStatus = BuildingStatus.PRODUCED;
         return;
       }
       System.out.println(
@@ -71,5 +71,15 @@ public class ToolBuilding implements IBuilding {
       return;
     }
     System.out.println("Tool factory for " + targets + " did not have enough resources.");
+    buildingStatus = BuildingStatus.NOT_ENOUGH_RESOURCES;
+  }
+
+  @Override
+  public String toString() {
+    return switch (buildingStatus) {
+      case PRODUCED -> "Tool Factory for " + targets + " (produced last turn)";
+      case NOT_ENOUGH_RESOURCES -> "Tool Factory for " + targets + " (not enough resources)";
+      case IN_PROGRESS -> "Tool Factory for " + targets + " (in progress)";
+    };
   }
 }

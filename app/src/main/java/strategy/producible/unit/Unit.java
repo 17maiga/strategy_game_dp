@@ -28,7 +28,7 @@ import strategy.world.WorldMap;
  * <p>Units can be grouped together in {@link Group}s. Groups allow units to move together and mine
  * resources together more efficiently.
  */
-public class Unit extends Producible {
+public class Unit {
   /** How many tiles the unit can move each turn. */
   private final int speed;
   /** How much the unit needs to eat each turn. */
@@ -54,11 +54,6 @@ public class Unit extends Producible {
     this.canMine = true;
     this.modifiers = modifiers;
     this.modifiers.forEach(modifier -> modifier.setUnit(this));
-  }
-
-  @Override
-  public Map<ResourceType, Integer> getCost() {
-    return Map.of(ResourceType.FOOD, 10, ResourceType.GOLD, 10);
   }
 
   public int getX() {
@@ -116,8 +111,8 @@ public class Unit extends Producible {
    */
   public int getEfficiency(final ResourceType resourceType) {
     if (tool == null) return 0;
-    if (!tool.getTargets().contains(resourceType)) return 0;
-    AtomicInteger efficiency = new AtomicInteger(tool.getEfficiency());
+    if (!tool.targets().contains(resourceType)) return 0;
+    AtomicInteger efficiency = new AtomicInteger(tool.efficiency());
     getActiveModifiers().stream()
         .filter(UnitModifier::isEfficiencyMultiplier)
         .forEach(modifier -> efficiency.set(modifier.updateEfficiency(efficiency.get())));
@@ -129,10 +124,11 @@ public class Unit extends Producible {
 
   public String getJob() {
     if (tool == null) return "Unemployed";
-    return tool.getTargets().stream()
-        .map(ResourceType::getJob)
-        .reduce((a, b) -> a + ", " + b)
-        .orElse("Unemployed");
+    return Tool.jobs.entrySet().stream()
+        .filter(entry -> entry.getValue().equals(tool.targets()))
+        .findFirst()
+        .map(Map.Entry::getKey)
+        .orElse(tool.targets().size() > 0 ? tool.targets().toString() : "Unemployed");
   }
 
   public int getXp() {
@@ -190,7 +186,7 @@ public class Unit extends Producible {
     if (canMine()) {
       Cell cell = worldMap.getCell(getX(), getY());
       ResourceType resourceType = cell.getType();
-      if (tool.getTargets().contains(resourceType) && cell.getAmount() > 0) {
+      if (tool.targets().contains(resourceType) && cell.getAmount() > 0) {
         int amount = cell.mine(getEfficiency(resourceType));
         inventory.addResources(resourceType, amount);
         addXp(amount);
@@ -254,11 +250,18 @@ public class Unit extends Producible {
   public void turn(final WorldMap worldMap, final Inventory inventory) {
     eat(inventory);
     if (!mine(worldMap, inventory) && getTool() != null) {
-      Cell closest = worldMap.getCell(getX(), getY()).findClosest(getTool().getTargets(), worldMap);
+      Cell closest = worldMap.getCell(getX(), getY()).findClosest(getTool().targets(), worldMap);
       if (closest != null) {
         move(closest.getX(), closest.getY(), worldMap);
       }
     }
     this.modifiers.forEach(UnitModifier::update);
+  }
+
+  @Override
+  public String toString() {
+    String format =
+        hasPlayed() ? "{ (%d %d) %s }" : canMine() ? "[ (%d %d) %s ]" : "( (%d %d) %s )";
+    return String.format(format, getX(), getY(), getJob());
   }
 }
