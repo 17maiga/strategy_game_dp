@@ -1,8 +1,6 @@
 package strategy;
 
 import java.util.*;
-
-import org.jetbrains.annotations.Contract;
 import strategy.producible.Tool;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
@@ -12,7 +10,8 @@ import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
 public class Game {
-  private static Game instance;
+  private final WorldMap worldMap;
+  private final Inventory inventory;
 
   public Game(final int width, final int height) {
     ArrayList<Unit> units = new ArrayList<>();
@@ -27,22 +26,10 @@ public class Game {
               unit.setTool(new Tool(1, List.of(type)));
               units.add(unit);
             });
-    WorldMap.getInstance(width, height).insertUnits(units);
-    Inventory.getInstance().add(ResourceType.FOOD, 100);
-  }
-
-  @Contract(pure = true)
-  public static Game getInstance() {
-    if (instance == null) {
-      throw new UnsupportedOperationException();
-    }
-    return instance;
-  }
-
-  public static void createInstance(final int width, final int height) {
-    if (instance == null) {
-      instance = new Game(width, height);
-    }
+    worldMap = new WorldMap(width, height);
+    worldMap.insertUnits(units);
+    inventory = new Inventory();
+    inventory.addResources(ResourceType.FOOD, 100);
   }
 
   public void render() {
@@ -53,7 +40,7 @@ public class Game {
     System.out.print("Inventory: ");
     System.out.println(
         Arrays.stream(ResourceType.values())
-            .map(type -> type + ": " + Inventory.getInstance().get(type))
+            .map(type -> type + ": " + inventory.getResources(type))
             .reduce((a, b) -> a + ", " + b)
             .orElse(""));
     for (int i = 0; i < 120; i++) {
@@ -71,60 +58,68 @@ public class Game {
                 .length()
             + 3;
 
-    for (int lineCount = 0; lineCount < WorldMap.getInstance().height(); lineCount++) {
-      WorldMap.getInstance()
-          .cells()
-          .get(lineCount)
-          .forEach(
-              cell -> {
-                StringBuilder displayBuilder = new StringBuilder();
-                if (cell.getUnit() != null) {
-                  units.add(cell.getUnit());
-                  if (cell.getUnit().hasPlayed()) {
-                    displayBuilder.append('{');
-                  } else if (cell.getUnit().canMine()) {
-                    displayBuilder.append('[');
-                  } else {
-                    displayBuilder.append('(');
-                  }
-                } else {
-                  displayBuilder.append(' ');
-                }
-                if (cell.getAmount() > 0) {
-                  displayBuilder.append(cell.getType().getSymbol());
-                  displayBuilder.append(cell.getAmount());
-                }
-                while (displayBuilder.length() < cellWidth) {
-                  displayBuilder.append(' ');
-                }
-                if (cell.getUnit() != null) {
-                  if (cell.getUnit().hasPlayed()) {
-                    displayBuilder.append('}');
-                  } else if (cell.getUnit().canMine()) {
-                    displayBuilder.append(']');
-                  } else {
-                    displayBuilder.append(')');
-                  }
-                } else {
-                  displayBuilder.append(' ');
-                }
-                System.out.print(displayBuilder);
-              });
+    // Print column numbers
+    System.out.print("   ");
+    for (int i = 0; i < worldMap.width(); i++) {
+      System.out.print(i);
+      for (int j = 0; j < cellWidth; j++) {
+        System.out.print(' ');
+      }
+    }
+    System.out.println("|");
+    for (int lineCount = 0; lineCount < worldMap.height(); lineCount++) {
+      List<Cell> row = worldMap.cells().get(lineCount);
+      System.out.print(lineCount + " ");
+      row.forEach(
+          cell -> {
+            StringBuilder displayBuilder = new StringBuilder();
+            if (cell.getUnit() != null) {
+              units.add(cell.getUnit());
+              if (cell.getUnit().hasPlayed()) {
+                displayBuilder.append('{');
+              } else if (cell.getUnit().canMine()) {
+                displayBuilder.append('[');
+              } else {
+                displayBuilder.append('(');
+              }
+            } else {
+              displayBuilder.append(' ');
+            }
+            if (cell.getAmount() > 0) {
+              displayBuilder.append(cell.getType().getSymbol());
+              displayBuilder.append(cell.getAmount());
+            }
+            while (displayBuilder.length() < cellWidth) {
+              displayBuilder.append(' ');
+            }
+            if (cell.getUnit() != null) {
+              if (cell.getUnit().hasPlayed()) {
+                displayBuilder.append('}');
+              } else if (cell.getUnit().canMine()) {
+                displayBuilder.append(']');
+              } else {
+                displayBuilder.append(')');
+              }
+            } else {
+              displayBuilder.append(' ');
+            }
+            System.out.print(displayBuilder);
+          });
       System.out.print(" | ");
       while (!units.isEmpty()) {
         Unit unit = units.poll();
         String format =
             unit.hasPlayed()
-                ? " {%s | %d:%d} "
-                : unit.canMine() ? " [%s | %d:%d] " : " (%s | %d:%d) ";
-        System.out.printf(format, unit.getJob(), unit.getX(), unit.getY());
+                ? " { (%d %d) %s } "
+                : unit.canMine() ? " [ (%d %d) %s ] " : " ( (%d %d) %s ) ";
+        System.out.printf(format, unit.getX(), unit.getY(), unit.getJob());
       }
       System.out.print('\n');
     }
   }
 
   private boolean turn() {
-    switch (WorldMap.getInstance().turn()) {
+    switch (worldMap.turn(inventory)) {
       case WON -> {
         System.out.println("You won!");
         return true;
@@ -204,7 +199,7 @@ public class Game {
     try {
       int x = Integer.parseInt(coordinates[0]);
       int y = Integer.parseInt(coordinates[1]);
-      Cell cell = WorldMap.getInstance().getCell(x, y);
+      Cell cell = worldMap.getCell(x, y);
       System.out.printf(
           "Cell at (%d %d):\n  Resources: %s\n",
           cell.getX(),
@@ -225,8 +220,7 @@ public class Game {
   }
 
   public void turnManual() {
-    List<Unit> units =
-        WorldMap.getInstance().getUnits().stream().filter(u -> !u.hasPlayed()).toList();
+    List<Unit> units = worldMap.getUnits().stream().filter(u -> !u.hasPlayed()).toList();
     if (units.isEmpty()) {
       System.out.println("No units left to play. Use 'turn' to go to the next turn.");
       return;
@@ -259,7 +253,7 @@ public class Game {
       String action = scanner.nextLine();
       switch (action) {
         case "m", "move" -> {
-          unit.eat();
+          unit.eat(inventory);
           System.out.print("Enter the coordinates of the cell you wish to move to: ");
           String[] coordinates = scanner.nextLine().split(" ");
           if (coordinates.length != 2) {
@@ -269,7 +263,7 @@ public class Game {
           try {
             int x = Integer.parseInt(coordinates[0]);
             int y = Integer.parseInt(coordinates[1]);
-            unit.move(x, y);
+            unit.move(x, y, worldMap);
           } catch (NumberFormatException e) {
             System.out.println("Invalid coordinates");
           }
@@ -277,8 +271,8 @@ public class Game {
           unit.setHasPlayed(true);
         }
         case "e", "extract" -> {
-          unit.eat();
-          if (unit.mine()) {
+          unit.eat(inventory);
+          if (unit.mine(worldMap, inventory)) {
             System.out.println("Mined successfully.");
           } else {
             System.out.println("Could not mine.");

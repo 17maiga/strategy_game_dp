@@ -114,8 +114,9 @@ public class Unit extends Producible {
    *
    * @return the unit's efficiency
    */
-  public int getEfficiency() {
+  public int getEfficiency(final ResourceType resourceType) {
     if (tool == null) return 0;
+    if (!tool.getTargets().contains(resourceType)) return 0;
     AtomicInteger efficiency = new AtomicInteger(tool.getEfficiency());
     getActiveModifiers().stream()
         .filter(UnitModifier::isEfficiencyMultiplier)
@@ -184,13 +185,13 @@ public class Unit extends Producible {
    *
    * @return whether the unit successfully mined
    */
-  public boolean mine() {
+  public boolean mine(final WorldMap worldMap, final Inventory inventory) {
     if (canMine()) {
-      Cell cell = WorldMap.getInstance().getCell(getX(), getY());
+      Cell cell = worldMap.getCell(getX(), getY());
       ResourceType resourceType = cell.getType();
       if (tool.getTargets().contains(resourceType) && cell.getAmount() > 0) {
-        int amount = cell.mine(getEfficiency());
-        Inventory.getInstance().add(resourceType, amount);
+        int amount = cell.mine(getEfficiency(resourceType));
+        inventory.addResources(resourceType, amount);
         addXp(amount);
         return true;
       }
@@ -206,11 +207,11 @@ public class Unit extends Producible {
    * @param x the x coordinate of the new location
    * @param y the y coordinate of the new location
    */
-  public void move(final int x, final int y) {
-    WorldMap.getInstance().getCell(getX(), getY()).setUnit(null);
+  public void move(final int x, final int y, final WorldMap worldMap) {
+    worldMap.getCell(getX(), getY()).setUnit(null);
     int distance =
-        Math.abs(Utils.clamp(x, 0, WorldMap.getInstance().width()) - getX())
-            + Math.abs(Utils.clamp(y, 0, WorldMap.getInstance().height()) - getY());
+        Math.abs(Utils.clamp(x, 0, worldMap.width()) - getX())
+            + Math.abs(Utils.clamp(y, 0, worldMap.height()) - getY());
     int speed = getSpeed();
     if (distance <= speed) {
       setX(x);
@@ -233,7 +234,7 @@ public class Unit extends Producible {
         speed--;
       }
     }
-    WorldMap.getInstance().getCell(getX(), getY()).insertUnit(this);
+    worldMap.getCell(getX(), getY()).insertUnit(this);
   }
 
   /**
@@ -242,20 +243,19 @@ public class Unit extends Producible {
    * <p>Units can only eat if there is at least {@link #getHunger()} food in the global {@link
    * Inventory}. If not, the unit will not be able to mine resources.
    */
-  public void eat() {
-    setCanMine(Inventory.getInstance().get(ResourceType.FOOD) >= getHunger());
+  public void eat(Inventory inventory) {
+    setCanMine(inventory.getResources(ResourceType.FOOD) >= getHunger());
     if (canMine()) {
-      Inventory.getInstance().remove(ResourceType.FOOD, getHunger());
+      inventory.removeResources(ResourceType.FOOD, getHunger());
     }
   }
 
-  public void turn() {
-    eat();
-    if (!mine()) {
-      Cell closest =
-          WorldMap.getInstance().getCell(getX(), getY()).findClosest(getTool().getTargets());
+  public void turn(final WorldMap worldMap, final Inventory inventory) {
+    eat(inventory);
+    if (!mine(worldMap, inventory)) {
+      Cell closest = worldMap.getCell(getX(), getY()).findClosest(getTool().getTargets(), worldMap);
       if (closest != null) {
-        move(closest.getX(), closest.getY());
+        move(closest.getX(), closest.getY(), worldMap);
       }
     }
     this.modifiers.forEach(UnitModifier::update);

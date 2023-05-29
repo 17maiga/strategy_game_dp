@@ -2,6 +2,8 @@ package strategy.producible.unit;
 
 import java.util.*;
 import strategy.producible.Tool;
+import strategy.world.Inventory;
+import strategy.world.ResourceType;
 import strategy.world.WorldMap;
 
 public class Group extends Unit {
@@ -52,12 +54,10 @@ public class Group extends Unit {
   }
 
   @Override
-  public int getEfficiency() {
+  public int getEfficiency(final ResourceType type) {
     return units.stream()
         .filter(Unit::canMine)
-        .filter(
-            unit ->
-                unit.getTool().canMine(WorldMap.getInstance().getCell(getX(), getY()).getType()))
+        .filter(unit -> unit.getTool().canMine(type))
         .mapToInt(unit -> unit.getTool().getEfficiency())
         .max()
         .orElse(0);
@@ -89,8 +89,8 @@ public class Group extends Unit {
             u ->
                 u.getTool().getTargets().size() == tool.getTargets().size()
                     && new HashSet<>(u.getTool().getTargets()).containsAll(tool.getTargets()))
-        .min(Comparator.comparingInt(Unit::getEfficiency))
-        .ifPresent(unit -> unit.setTool(tool));
+        .min(Comparator.comparingInt(u -> u.getTool().getEfficiency()))
+        .ifPresent(u -> u.setTool(tool));
   }
 
   @Override
@@ -104,27 +104,27 @@ public class Group extends Unit {
   }
 
   @Override
-  public boolean mine() {
-    return units.stream().allMatch(Unit::mine);
+  public boolean mine(final WorldMap worldMap, final Inventory inventory) {
+    return units.stream().allMatch(u -> u.mine(worldMap, inventory));
   }
 
   @Override
-  public void eat() {
-    units.forEach(Unit::eat);
+  public void eat(Inventory inventory) {
+    units.forEach(u -> u.eat(inventory));
   }
 
   @Override
-  public void turn() {
-    units.forEach(Unit::turn);
+  public void turn(final WorldMap worldMap, final Inventory inventory) {
+    units.forEach(u -> u.turn(worldMap, inventory));
     units.stream()
         .filter(unit -> unit.getX() != getX() || unit.getY() != getY())
         .toList()
         .forEach(this::removeUnit);
     if (units.size() == 1) {
       Unit unit = units.remove(0);
-      WorldMap.getInstance().getCell(getX(), getY()).setUnit(unit);
+      worldMap.getCell(getX(), getY()).setUnit(unit);
     } else if (units.isEmpty()) {
-      WorldMap.getInstance().getCell(getX(), getY()).setUnit(null);
+      worldMap.getCell(getX(), getY()).setUnit(null);
     }
   }
 }

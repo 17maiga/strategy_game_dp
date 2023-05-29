@@ -1,5 +1,6 @@
 package strategy.building;
 
+import org.jetbrains.annotations.NotNull;
 import strategy.producible.Tool;
 import strategy.producible.unit.Unit;
 import strategy.world.Inventory;
@@ -14,12 +15,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ToolBuilding implements IBuilding<Tool> {
   @Override
-  public Tool produce() {
-    if (Inventory.getInstance().contains(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10))) {
-      Inventory.getInstance().remove(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10));
+  public Tool produce(final WorldMap worldMap, final @NotNull Inventory inventory) {
+    if (inventory.containsResources(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10))) {
+      inventory.removeResources(Map.of(ResourceType.WOOD, 10, ResourceType.ROCK, 10));
       AtomicInteger efficiency = new AtomicInteger();
       AtomicReference<List<ResourceType>> targets = new AtomicReference<>();
-      WorldMap.getInstance().getUnits().stream()
+      worldMap.getUnits().stream()
           .map(Unit::getTool)
           .min(Comparator.comparingInt(Tool::getEfficiency))
           .ifPresent(

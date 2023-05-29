@@ -100,7 +100,7 @@ public class Cell {
    * @param types the types to find
    * @return the closest cell of one of the given types
    */
-  public Cell findClosest(final List<ResourceType> types) {
+  public Cell findClosest(final List<ResourceType> types, final WorldMap worldMap) {
     Queue<Cell> queue = new ArrayDeque<>();
     List<Cell> visited = new ArrayList<>();
     queue.add(this);
@@ -111,28 +111,28 @@ public class Cell {
         return cell;
       }
       if (cell.getX() > 0) {
-        Cell left = WorldMap.getInstance().getCell(cell.getX() - 1, cell.getY());
+        Cell left = worldMap.getCell(cell.getX() - 1, cell.getY());
         if (!visited.contains(left)) {
           queue.add(left);
           visited.add(left);
         }
       }
-      if (cell.getX() < WorldMap.getInstance().width() - 1) {
-        Cell right = WorldMap.getInstance().getCell(cell.getX() + 1, cell.getY());
+      if (cell.getX() < worldMap.width() - 1) {
+        Cell right = worldMap.getCell(cell.getX() + 1, cell.getY());
         if (!visited.contains(right)) {
           queue.add(right);
           visited.add(right);
         }
       }
       if (cell.getY() > 0) {
-        Cell top = WorldMap.getInstance().getCell(cell.getX(), cell.getY() - 1);
+        Cell top = worldMap.getCell(cell.getX(), cell.getY() - 1);
         if (!visited.contains(top)) {
           queue.add(top);
           visited.add(top);
         }
       }
-      if (cell.getY() < WorldMap.getInstance().height() - 1) {
-        Cell bottom = WorldMap.getInstance().getCell(cell.getX(), cell.getY() + 1);
+      if (cell.getY() < worldMap.height() - 1) {
+        Cell bottom = worldMap.getCell(cell.getX(), cell.getY() + 1);
         if (!visited.contains(bottom)) {
           queue.add(bottom);
           visited.add(bottom);
