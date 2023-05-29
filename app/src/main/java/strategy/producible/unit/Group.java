@@ -122,6 +122,20 @@ public class Group extends Unit {
   @Override
   public void turn(final WorldMap worldMap, final Inventory inventory) {
     units.forEach(u -> u.turn(worldMap, inventory));
+    List<Unit> toRemove =
+        units.stream()
+            .filter(u -> !u.canMine())
+            .peek(
+                u -> {
+                  Cell cell = worldMap.getCell(u.getX(), u.getY()).findClosestEmpty(worldMap);
+                  if (cell != null) {
+                    u.setX(cell.getX());
+                    u.setY(cell.getY());
+                    cell.insertUnit(u);
+                  }
+                })
+            .toList();
+    toRemove.forEach(this::removeUnit);
     units.stream()
         .filter(unit -> unit.getX() != getX() || unit.getY() != getY())
         .toList()

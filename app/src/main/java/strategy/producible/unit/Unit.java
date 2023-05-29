@@ -250,7 +250,8 @@ public class Unit {
   public void turn(final WorldMap worldMap, final Inventory inventory) {
     eat(inventory);
     if (!mine(worldMap, inventory) && getTool() != null) {
-      Cell closest = worldMap.getCell(getX(), getY()).findClosest(getTool().targets(), worldMap);
+      Cell closest =
+          worldMap.getCell(getX(), getY()).findClosestResources(getTool().targets(), worldMap);
       if (closest != null) {
         move(closest.getX(), closest.getY(), worldMap);
       }
