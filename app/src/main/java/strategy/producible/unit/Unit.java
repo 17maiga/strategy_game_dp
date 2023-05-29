@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import strategy.Utils;
-import strategy.producible.Producible;
 import strategy.producible.Tool;
 import strategy.producible.unit.modifier.UnitModifier;
 import strategy.world.Cell;
@@ -205,6 +204,7 @@ public class Unit {
    * @param y the y coordinate of the new location
    */
   public void move(final int x, final int y, final WorldMap worldMap) {
+    if (!canMine()) return;
     worldMap.getCell(getX(), getY()).setUnit(null);
     int distance =
         Math.abs(Utils.clamp(x, 0, worldMap.width()) - getX())
@@ -260,8 +260,7 @@ public class Unit {
 
   @Override
   public String toString() {
-    String format =
-        hasPlayed() ? "{ (%d %d) %s }" : canMine() ? "[ (%d %d) %s ]" : "( (%d %d) %s )";
+    String format = hasPlayed() ? "{(%d %d) %s}" : canMine() ? "[(%d %d) %s]" : "((%d %d) %s)";
     return String.format(format, getX(), getY(), getJob());
   }
 }
