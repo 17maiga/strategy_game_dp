@@ -54,7 +54,7 @@ public record WorldMap(int width, int height, List<List<Cell>> cells) {
     return Game.Status.RUNNING;
   }
 
-  public @NotNull List<Unit> getUnits() {
+  public List<Unit> getUnits() {
     return cells.stream()
         .flatMap(List::stream)
         .map(Cell::getUnit)

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import strategy.Config;
 import strategy.Utils;
 import strategy.producible.Tool;
 import strategy.producible.unit.modifier.UnitModifier;
@@ -45,11 +46,11 @@ public class Unit {
   /** The tool the unit is equipped with. */
   private Tool tool;
 
-  public Unit(final int x, final int y, final @NotNull List<UnitModifier> modifiers) {
+  public Unit(final int x, final int y, final List<UnitModifier> modifiers) {
     this.x = x;
     this.y = y;
-    this.speed = 5;
-    this.hunger = 1;
+    this.speed = Config.UNIT_BASE_SPEED;
+    this.hunger = Config.UNIT_BASE_HUNGER;
     this.canMine = true;
     this.modifiers = modifiers;
     this.modifiers.forEach(modifier -> modifier.setUnit(this));
@@ -123,7 +124,7 @@ public class Unit {
 
   public String getJob() {
     if (tool == null) return "Unemployed";
-    return Tool.jobs.entrySet().stream()
+    return Config.JOBS.entrySet().stream()
         .filter(entry -> entry.getValue().equals(tool.targets()))
         .findFirst()
         .map(Map.Entry::getKey)
@@ -261,7 +262,13 @@ public class Unit {
 
   @Override
   public String toString() {
-    String format = hasPlayed() ? "{(%d %d) %s}" : canMine() ? "[(%d %d) %s]" : "((%d %d) %s)";
-    return String.format(format, getX(), getY(), getJob());
+    String format =
+        hasPlayed() ? "{(%d %d) %s (%s)}" : canMine() ? "[(%d %d) %s (%s)]" : "((%d %d) %s (%s))";
+    return String.format(
+        format,
+        getX(),
+        getY(),
+        getJob(),
+        getActiveModifiers().stream().map(UnitModifier::indicator).collect(Collectors.joining("")));
   }
 }

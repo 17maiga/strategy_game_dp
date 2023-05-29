@@ -1,13 +1,13 @@
 package strategy;
 
 import java.util.*;
-
 import strategy.building.IBuilding;
 import strategy.building.ToolBuilding;
 import strategy.building.UnitBuilding;
 import strategy.producible.Tool;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
+import strategy.producible.unit.modifier.UnitModifier;
 import strategy.world.Cell;
 import strategy.world.Inventory;
 import strategy.world.ResourceType;
@@ -19,18 +19,25 @@ public class Game {
 
   public Game(final int width, final int height) {
     ArrayList<Unit> units = new ArrayList<>();
-    Tool.jobs.forEach(
+    Config.JOBS.forEach(
         (job, resources) -> {
+          List<UnitModifier> modifiers = new ArrayList<>();
+          for (Class<? extends UnitModifier> clazz : Config.UNIT_MODIFIERS) {
+            try {
+              modifiers.add(clazz.getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
           Unit unit =
-              new Unit(
-                  (int) (Math.random() * width), (int) (Math.random() * height), new ArrayList<>());
+              new Unit((int) (Math.random() * width), (int) (Math.random() * height), modifiers);
           unit.setTool(new Tool(1, resources));
           units.add(unit);
         });
     worldMap = new WorldMap(width, height);
     worldMap.insertUnits(units);
     inventory = new Inventory();
-    inventory.addResources(ResourceType.FOOD, 100);
+    inventory.addResources(ResourceType.FOOD, Config.INITIAL_FOOD_AMOUNT);
   }
 
   public void play() {
@@ -43,7 +50,7 @@ public class Game {
       String input = scanner.nextLine();
       switch (input) {
         case "h", "help" -> helpMain();
-        case "t", "turn", "" -> {
+        case "t", "turn" -> {
           shouldQuit = turn();
           if (!shouldQuit) {
             render();
@@ -76,10 +83,9 @@ public class Game {
         System.out.println("You lost!");
         return true;
       }
-      case RUNNING -> {
-        inventory.getBuildings().forEach(building -> building.produce(worldMap, inventory));
-        System.out.println("Turn played");
-      }
+      case RUNNING -> inventory
+          .getBuildings()
+          .forEach(building -> building.produce(worldMap, inventory));
     }
     return false;
   }
@@ -117,17 +123,24 @@ public class Game {
             + 3;
 
     // Print column numbers
-    System.out.print("   ");
+    for (int i = 0; i < String.valueOf(worldMap.height()).length() + 2; i++) {
+      System.out.print(' ');
+    }
     for (int i = 0; i < worldMap.width(); i++) {
-      System.out.print(i);
-      for (int j = 0; j < cellWidth; j++) {
-        System.out.print(' ');
+      StringBuilder iString = new StringBuilder(String.valueOf(i));
+      while (iString.length() < cellWidth + 1) {
+        iString.append(" ");
       }
+      System.out.print(iString);
     }
     System.out.println("| Units:");
     for (int lineCount = 0; lineCount < worldMap.height(); lineCount++) {
       List<Cell> row = worldMap.cells().get(lineCount);
-      System.out.print(lineCount + " ");
+      StringBuilder lineCountBuilder = new StringBuilder(String.valueOf(lineCount));
+      while (lineCountBuilder.length() < String.valueOf(worldMap.height()).length() + 1) {
+        lineCountBuilder.append(" ");
+      }
+      System.out.print(lineCountBuilder);
       row.forEach(
           cell -> {
             StringBuilder displayBuilder = new StringBuilder();
@@ -313,14 +326,14 @@ public class Game {
       case "u", "unit" -> {
         if (inventory.containsResources(IBuilding.getCost())) {
           System.out.println("Select the type of unit you wish to produce:");
-          Tool.jobs.forEach((key, value) -> System.out.printf("  %s %s\n", key, value));
+          Config.JOBS.forEach((key, value) -> System.out.printf("  %s %s\n", key, value));
           System.out.print("purchase> ");
           String job = scanner.nextLine();
-          if (!Tool.jobs.containsKey(job)) {
+          if (!Config.JOBS.containsKey(job)) {
             System.out.println("Invalid unit");
             return;
           }
-          List<ResourceType> resources = Tool.jobs.get(job);
+          List<ResourceType> resources = Config.JOBS.get(job);
           inventory.removeResources(IBuilding.getCost());
           inventory.addBuilding(new UnitBuilding(resources));
         } else {
@@ -330,14 +343,14 @@ public class Game {
       case "t", "tool" -> {
         if (inventory.containsResources(IBuilding.getCost())) {
           System.out.println("Select the type of unit you wish to produce tools for:");
-          Tool.jobs.forEach((key, value) -> System.out.printf("  %s (%s)\n", key, value));
+          Config.JOBS.forEach((key, value) -> System.out.printf("  %s (%s)\n", key, value));
           System.out.print("purchase> ");
           String tool = scanner.nextLine();
-          if (!Tool.jobs.containsKey(tool)) {
+          if (!Config.JOBS.containsKey(tool)) {
             System.out.println("Invalid unit");
             return;
           }
-          List<ResourceType> resources = Tool.jobs.get(tool);
+          List<ResourceType> resources = Config.JOBS.get(tool);
           inventory.removeResources(IBuilding.getCost());
           inventory.addBuilding(new ToolBuilding(resources));
         } else {

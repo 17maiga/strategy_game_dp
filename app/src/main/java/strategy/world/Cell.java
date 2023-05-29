@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import org.jetbrains.annotations.Nullable;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
 
@@ -47,7 +46,7 @@ public class Cell {
     return amount;
   }
 
-  public @Nullable Unit getUnit() {
+  public Unit getUnit() {
     return unit;
   }
 

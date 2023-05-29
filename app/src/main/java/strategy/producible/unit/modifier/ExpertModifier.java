@@ -1,6 +1,6 @@
 package strategy.producible.unit.modifier;
 
-import org.jetbrains.annotations.Contract;
+import strategy.Config;
 
 /**
  * Expert modifier for units.
@@ -12,9 +12,8 @@ public class ExpertModifier extends UnitModifier {
   /** Countdown to deactivate. */
   private int deactivateCountdown;
 
-  @Contract(pure = true)
   public ExpertModifier() {
-    deactivateCountdown = 5;
+    deactivateCountdown = Config.EXPERT_DEACTIVATE_COUNTDOWN;
   }
 
   @Override
@@ -23,9 +22,8 @@ public class ExpertModifier extends UnitModifier {
   }
 
   @Override
-  @Contract(pure = true)
   public int updateEfficiency(final int efficiency) {
-    return efficiency * 2;
+    return efficiency * Config.EXPERT_EFFICIENCY_MULTIPLIER;
   }
 
   @Override
@@ -34,9 +32,8 @@ public class ExpertModifier extends UnitModifier {
   }
 
   @Override
-  @Contract(pure = true)
   public int updateSpeed(final int speed) {
-    return (int) Math.floor(speed * 1.5);
+    return (int) Math.floor(speed * Config.EXPERT_SPEED_MULTIPLIER);
   }
 
   @Override
@@ -45,9 +42,8 @@ public class ExpertModifier extends UnitModifier {
   }
 
   @Override
-  @Contract(pure = true)
   public int updateHunger(final int hunger) {
-    return 2 * hunger;
+    return hunger * Config.EXPERT_HUNGER_MULTIPLIER;
   }
 
   /**
@@ -63,16 +59,21 @@ public class ExpertModifier extends UnitModifier {
       return;
     }
     if (active) {
-      if (unit.canMine()) deactivateCountdown = 5;
+      if (unit.canMine()) deactivateCountdown = Config.EXPERT_DEACTIVATE_COUNTDOWN;
       else {
         deactivateCountdown--;
         if (deactivateCountdown == 0) {
           active = false;
-          deactivateCountdown = 5;
+          deactivateCountdown = Config.EXPERT_DEACTIVATE_COUNTDOWN;
         }
       }
-    } else if (unit.getXp() > 100 && unit.canMine()) {
+    } else if (unit.getXp() > Config.EXPERT_XP_THRESHOLD && unit.canMine()) {
       active = true;
     }
+  }
+
+  @Override
+  public String indicator() {
+    return "E";
   }
 }

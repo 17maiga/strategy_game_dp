@@ -1,11 +1,7 @@
 package strategy.producible;
 
 import java.util.List;
-import java.util.Map;
-
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import strategy.world.ResourceType;
 
 /**
@@ -15,16 +11,6 @@ import strategy.world.ResourceType;
  * they can mine. They can be produced by buildings.
  */
 public record Tool(int efficiency, List<ResourceType> targets) {
-
-  public static final Map<String, List<ResourceType>> jobs =
-      Map.of(
-          "Miner",
-          List.of(ResourceType.ROCK, ResourceType.GOLD),
-          "Lumberjack",
-          List.of(ResourceType.WOOD),
-          "Farmer",
-          List.of(ResourceType.FOOD));
-
   /**
    * Whether the tool can mine a certain resource.
    *

@@ -1,6 +1,5 @@
 package strategy.producible.unit.modifier;
 
-import org.jetbrains.annotations.Nullable;
 import strategy.producible.unit.Unit;
 
 /**
@@ -12,18 +11,18 @@ import strategy.producible.unit.Unit;
  * should be applied or not. When getting a unit's stats, the unit will call the appropriate methods
  * from each active modifier to get the final result.
  */
-public class UnitModifier {
+public abstract class UnitModifier {
   /** <b>The unit this modifier is attached to.</b> */
-  protected @Nullable Unit unit = null;
+  protected Unit unit = null;
 
   /** <b>Whether this modifier is active or not.</b> */
   protected boolean active = false;
 
-  public @Nullable Unit getUnit() {
+  public Unit getUnit() {
     return unit;
   }
 
-  public void setUnit(@Nullable final Unit unit) {
+  public void setUnit(final Unit unit) {
     this.unit = unit;
   }
 
@@ -100,4 +99,6 @@ public class UnitModifier {
    * and is able to mine.
    */
   public void update() {}
+
+  public abstract String indicator();
 }

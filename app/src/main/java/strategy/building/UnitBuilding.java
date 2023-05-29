@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import strategy.Config;
 import strategy.producible.Tool;
 import strategy.producible.unit.Unit;
 import strategy.world.Inventory;
@@ -15,7 +16,7 @@ public class UnitBuilding implements IBuilding {
 
   private final List<ResourceType> targets;
   private BuildingStatus buildingStatus = BuildingStatus.IN_PROGRESS;
-  private int productionTime = 2;
+  private int productionTime = Config.BUILDING_PRODUCTION_TIME;
 
   public UnitBuilding(List<ResourceType> targets) {
     this.targets = targets;
@@ -28,8 +29,8 @@ public class UnitBuilding implements IBuilding {
       buildingStatus = BuildingStatus.IN_PROGRESS;
       return;
     }
-    productionTime = 2;
-    Map<ResourceType, Integer> cost = Map.of(ResourceType.GOLD, 1, ResourceType.FOOD, 1);
+    productionTime = Config.BUILDING_PRODUCTION_TIME;
+    Map<ResourceType, Integer> cost = Config.UNIT_COST;
     if (inventory.containsResources(cost)) {
       inventory.removeResources(cost);
       Unit unit =
@@ -38,7 +39,7 @@ public class UnitBuilding implements IBuilding {
               (int) (Math.random() * worldMap.height()),
               new ArrayList<>());
       if (targets.size() > 0) {
-        unit.setTool(new Tool(1, targets));
+        unit.setTool(new Tool(Config.TOOL_BASE_EFFICIENCY, targets));
       }
       worldMap.insertUnits(List.of(unit));
       buildingStatus = BuildingStatus.PRODUCED;
@@ -50,7 +51,7 @@ public class UnitBuilding implements IBuilding {
   @Override
   public String toString() {
     return "Unit factory ("
-        + Tool.jobs.entrySet().stream()
+        + Config.JOBS.entrySet().stream()
             .filter(
                 e ->
                     targets.size() == e.getValue().size()

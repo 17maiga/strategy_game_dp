@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jetbrains.annotations.Contract;
+
 import org.jetbrains.annotations.NotNull;
 import strategy.building.IBuilding;
 
@@ -17,7 +17,6 @@ public class Inventory {
   private final Map<ResourceType, Integer> resources;
   private final List<IBuilding> buildings;
 
-  @Contract(pure = true)
   public Inventory() {
     this.resources = new HashMap<>();
     this.buildings = new ArrayList<>();
@@ -50,10 +49,6 @@ public class Inventory {
 
   public void addBuilding(final IBuilding building) {
     buildings.add(building);
-  }
-
-  public void removeBuilding(final IBuilding building) {
-    buildings.remove(building);
   }
 
   public List<IBuilding> getBuildings() {

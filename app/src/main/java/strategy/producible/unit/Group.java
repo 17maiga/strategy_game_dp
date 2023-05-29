@@ -4,7 +4,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jetbrains.annotations.NotNull;
+import strategy.Config;
 import strategy.producible.Tool;
+import strategy.world.Cell;
 import strategy.world.Inventory;
 import strategy.world.ResourceType;
 import strategy.world.WorldMap;
@@ -65,10 +67,13 @@ public class Group extends Unit {
             .toList();
     AtomicReference<Float> base =
         new AtomicReference<>((float) units.stream().mapToInt(u -> u.getEfficiency(type)).sum());
-    units.forEach(u -> base.updateAndGet(v -> (float) (v * 1.1)));
+    units.forEach(
+        u ->
+            base.updateAndGet(v -> (float) (v * Config.GROUP_EFFICIENCY_MULTIPLIER)));
     return (int) Math.floor(base.get());
   }
 
+  @Override
   public String getJob() {
     return "Group";
   }

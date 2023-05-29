@@ -1,6 +1,7 @@
 package strategy.world;
 
 import org.jetbrains.annotations.Contract;
+import strategy.Config;
 
 /**
  * Enum representing the different types of resources in the game.
@@ -9,10 +10,18 @@ import org.jetbrains.annotations.Contract;
  * the map.
  */
 public enum ResourceType {
-  WOOD(0.3, 3),
-  ROCK(0.3, 3),
-  GOLD(0.3, 3),
-  FOOD(0.3, 3);
+  WOOD(
+      Config.RESOURCE_WOOD_SPAWN_CHANCE,
+      Config.RESOURCE_WOOD_MAX_VEIN_SIZE),
+  ROCK(
+      Config.RESOURCE_ROCK_SPAWN_CHANCE,
+      Config.RESOURCE_ROCK_MAX_VEIN_SIZE),
+  GOLD(
+      Config.RESOURCE_GOLD_SPAWN_CHANCE,
+      Config.RESOURCE_GOLD_MAX_VEIN_SIZE),
+  FOOD(
+      Config.RESOURCE_FOOD_SPAWN_CHANCE,
+      Config.RESOURCE_FOOD_MAX_VEIN_SIZE);
 
   private final double spawnChance;
   private final int maxVeinSize;
@@ -24,7 +33,6 @@ public enum ResourceType {
     symbol = name().charAt(0);
   }
 
-  @Contract(pure = true)
   public static ResourceType getRandomType() {
     return values()[(int) (Math.random() * values().length)];
   }

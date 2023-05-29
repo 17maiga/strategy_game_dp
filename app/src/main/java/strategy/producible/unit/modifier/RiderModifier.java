@@ -1,5 +1,7 @@
 package strategy.producible.unit.modifier;
 
+import strategy.Config;
+
 public class RiderModifier extends UnitModifier {
   @Override
   public boolean isSpeedMultiplier() {
@@ -8,12 +10,12 @@ public class RiderModifier extends UnitModifier {
 
   @Override
   public int updateSpeed(final int speed) {
-    return 2 * speed;
+    return speed * Config.RIDER_SPEED_MULTIPLIER;
   }
 
   @Override
   public int updateHunger(final int hunger) {
-    return hunger + 3;
+    return hunger + Config.RIDER_HUNGER_INCREASE;
   }
 
   @Override
@@ -27,5 +29,10 @@ public class RiderModifier extends UnitModifier {
     } else if (unit.canMine()) {
       active = true;
     }
+  }
+
+  @Override
+  public String indicator() {
+    return "R";
   }
 }
