@@ -13,9 +13,9 @@ import strategy.world.WorldMap;
 
 public class UnitBuilding implements IBuilding {
 
+  private final List<ResourceType> targets;
   private BuildingStatus buildingStatus = BuildingStatus.IN_PROGRESS;
   private int productionTime = 2;
-  private final List<ResourceType> targets;
 
   public UnitBuilding(List<ResourceType> targets) {
     this.targets = targets;
@@ -28,6 +28,7 @@ public class UnitBuilding implements IBuilding {
       buildingStatus = BuildingStatus.IN_PROGRESS;
       return;
     }
+    productionTime = 2;
     Map<ResourceType, Integer> cost = Map.of(ResourceType.GOLD, 1, ResourceType.FOOD, 1);
     if (inventory.containsResources(cost)) {
       inventory.removeResources(cost);
@@ -40,11 +41,9 @@ public class UnitBuilding implements IBuilding {
         unit.setTool(new Tool(1, targets));
       }
       worldMap.insertUnits(List.of(unit));
-      System.out.println("Unit factory produced a unit.");
       buildingStatus = BuildingStatus.PRODUCED;
       return;
     }
-    System.out.println("Unit factory does not have enough resources to produce a unit.");
     buildingStatus = BuildingStatus.NOT_ENOUGH_RESOURCES;
   }
 
