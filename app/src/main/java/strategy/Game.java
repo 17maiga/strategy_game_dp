@@ -1,6 +1,7 @@
 package strategy;
 
 import java.util.*;
+import strategy.building.UnitBuilding;
 import strategy.producible.Tool;
 import strategy.producible.unit.Group;
 import strategy.producible.unit.Unit;
@@ -30,6 +31,7 @@ public class Game {
     worldMap.insertUnits(units);
     inventory = new Inventory();
     inventory.addResources(ResourceType.FOOD, 100);
+    inventory.addBuilding(new UnitBuilding());
   }
 
   public void render() {
@@ -128,7 +130,10 @@ public class Game {
         System.out.println("You lost!");
         return true;
       }
-      case RUNNING -> System.out.println("Turn played");
+      case RUNNING -> {
+        inventory.getBuildings().forEach(building -> building.produce(worldMap, inventory));
+        System.out.println("Turn played");
+      }
     }
     return false;
   }

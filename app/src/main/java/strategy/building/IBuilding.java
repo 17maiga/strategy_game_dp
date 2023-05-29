@@ -3,9 +3,7 @@ package strategy.building;
 import strategy.world.Inventory;
 import strategy.world.WorldMap;
 
-public interface IBuilding<T> {
-  /**
-   * @return the producible object.
-   */
-  T produce(final WorldMap worldMap, final Inventory inventory);
+public interface IBuilding {
+  /** Produces a resource with the given {@link WorldMap} and {@link Inventory}. */
+  void produce(final WorldMap worldMap, final Inventory inventory);
 }

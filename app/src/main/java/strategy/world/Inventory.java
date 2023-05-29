@@ -7,7 +7,6 @@ import java.util.Map;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import strategy.building.IBuilding;
-import strategy.producible.Producible;
 
 /**
  * Singleton class that represents the inventory of the player.
@@ -16,10 +15,12 @@ import strategy.producible.Producible;
  */
 public class Inventory {
   private final Map<ResourceType, Integer> resources;
+  private final List<IBuilding> buildings;
 
   @Contract(pure = true)
   public Inventory() {
     this.resources = new HashMap<>();
+    this.buildings = new ArrayList<>();
   }
 
   public void addResources(final ResourceType type, final int amount) {
@@ -45,5 +46,17 @@ public class Inventory {
   public boolean containsResources(final @NotNull Map<ResourceType, Integer> resources) {
     return resources.entrySet().stream()
         .allMatch(entry -> containsResources(entry.getKey(), entry.getValue()));
+  }
+
+  public void addBuilding(final IBuilding building) {
+    buildings.add(building);
+  }
+
+  public void removeBuilding(final IBuilding building) {
+    buildings.remove(building);
+  }
+
+  public List<IBuilding> getBuildings() {
+    return buildings;
   }
 }

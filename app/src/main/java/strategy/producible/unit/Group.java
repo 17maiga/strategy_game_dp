@@ -1,6 +1,8 @@
 package strategy.producible.unit;
 
 import java.util.*;
+
+import org.jetbrains.annotations.NotNull;
 import strategy.producible.Tool;
 import strategy.world.Inventory;
 import strategy.world.ResourceType;
@@ -109,7 +111,7 @@ public class Group extends Unit {
   }
 
   @Override
-  public void eat(Inventory inventory) {
+  public void eat(@NotNull Inventory inventory) {
     units.forEach(u -> u.eat(inventory));
   }
 

@@ -186,6 +186,7 @@ public class Unit extends Producible {
    * @return whether the unit successfully mined
    */
   public boolean mine(final WorldMap worldMap, final Inventory inventory) {
+    if (tool == null) return false;
     if (canMine()) {
       Cell cell = worldMap.getCell(getX(), getY());
       ResourceType resourceType = cell.getType();
@@ -243,7 +244,7 @@ public class Unit extends Producible {
    * <p>Units can only eat if there is at least {@link #getHunger()} food in the global {@link
    * Inventory}. If not, the unit will not be able to mine resources.
    */
-  public void eat(Inventory inventory) {
+  public void eat(@NotNull Inventory inventory) {
     setCanMine(inventory.getResources(ResourceType.FOOD) >= getHunger());
     if (canMine()) {
       inventory.removeResources(ResourceType.FOOD, getHunger());
@@ -252,7 +253,7 @@ public class Unit extends Producible {
 
   public void turn(final WorldMap worldMap, final Inventory inventory) {
     eat(inventory);
-    if (!mine(worldMap, inventory)) {
+    if (!mine(worldMap, inventory) && getTool() != null) {
       Cell closest = worldMap.getCell(getX(), getY()).findClosest(getTool().getTargets(), worldMap);
       if (closest != null) {
         move(closest.getX(), closest.getY(), worldMap);
